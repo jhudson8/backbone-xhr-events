@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>Mocha</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link rel="stylesheet" href="spec/browser/mocha.css" />
+    <script src="spec/browser/underscore.js"></script>
+    <script src="spec/browser/jquery.js"></script>
+    <script src="spec/browser/backbone.js"></script>
+    <script src="backbone-async-event.js"></script>
+
+    <script src="spec/browser/chai.js"></script>
+    <script src="spec/mocha.js"></script>
+    <script src="spec/browser/sinon.js"></script>
+    <script src="spec/browser/spy.js"></script>
+    <script src="spec/browser/call.js"></script>
+
+    <script>mocha.setup('bdd')</script>
+
+    <script>
+      function assert(expr, msg) {
+        if (!expr) throw new Error(msg || 'failed');
+      }
+    </script>
+    
+    
+    <script src="spec/backbone-async-event.js"></script>
+    <script>
+      onload = function(){
+        var runner = mocha.run();
+        // runner.globals(['foo', 'bar', 'baz']);
+
+        // runner.on('test end', function(test){
+        //   console.log(test.fullTitle());
+        // });
+      };
+    </script>
+
+  </head>
+  <body>
+    <div id="mocha"></div>
+  </body>
+</html>
