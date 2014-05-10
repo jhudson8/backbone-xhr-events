@@ -14,13 +14,13 @@ Any time ajax requests are made using Backbone.sync (all of the backbone ajax re
 
 Events
 ------
-* sync: function({event name}, {lifecycle events});
-* sync:{event name}: function({lifecycle events})
+* ```sync```: function({event name}, {lifecycle events});
+* ```sync:{event name}```: function({lifecycle events})
 
 The ```lifecycle events``` is a [Backbone.Events](http://backbonejs.org/#Events).  The follwing events may be triggered:
 * success(model, options): triggered when/if the ajax request was successful
-* error(model, resp, options): triggered when/if the ajax request failed
-* complete({"error"|"success"}, model[, errorType, error], options); triggered on either success or error
+* error(model, errorType, thrownError, options): triggered when/if the ajax request failed
+* complete({"error"|"success"}, model[, errorType, thrownError], options); triggered on either success or error
 
 Examples
 --------
@@ -28,20 +28,21 @@ Examples
 var model = new MyModel();
 
 // bind to *all* async events
-model.on('async', function(eventName, asyncEvents) {
-  asyncEvents.on('success', function(model, options) {
+model.on('async', function(eventName, lifecycleEvents) {
+  lifecycleEvents.on('success', function(model, options) {
     // the operation was successful and the updated model is provided as a parameter
   });
-  asyncEvents.on('error', function(model, errorType, error, options) {
+  lifecycleEvents.on('error', function(model, errorType, error, options) {
     // the operation failed and the parameters are proxied straight from the $.ajax error call
   });
-  asyncEvents.on('complete', function(type (error|success), model[, errorType, error], options) {
+  lifecycleEvents.on('complete', function(type, model) {
     // the operation was successful or errored and the payload will either look like a success or error payload
+    // type is either "success" or "error"
   });
 });
 
 // bind to a single async event
-model.on('async:read', function(asyncEvents) {
+model.on('async:read', function(lifecycleEvents) {
   // notice that the event name is not provided to this function
 });
 
@@ -49,7 +50,7 @@ model.on('async:read', function(asyncEvents) {
 
 Event Names
 -----------
-The event name can be overridden by setting the ```event``` attribute on the request options but otherwise it will be:
+The async event name can be overridden by setting the ```event``` attribute on the request options but otherwise it will be:
  * fetch: ```read```
  * save: ```update```
  * destroy: ```delete```
@@ -60,5 +61,5 @@ model.fetch({event: 'foo'})
 ```
 or call Backbone.sync directly
 ```
-Backbone.sync(asyncEvent, model, options);
+Backbone.sync(asyncEventName, model, options);
 ```
