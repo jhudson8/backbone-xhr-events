@@ -18,7 +18,7 @@ var chai = require('chai'),
           options.error && options.error.apply(options, arguments);
         }
       };
-require('../backbone-async-event')
+require('../index')(Backbone);
 chai.use(sinonChai);
 Backbone.$ = $;
 
