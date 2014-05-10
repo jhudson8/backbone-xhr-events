@@ -6,7 +6,7 @@ Simple backbone plugin that emits specific events when ajax requests are made.  
 Installation
 ------------
 * Browser: backbone-async-event.js/backbone-async-event.min.js; *after* [backbone.js](http://backbonejs.org/)
-* CommonJS: ```require('backbone-async-event');```
+* CommonJS: ```require('backbone-async-event')(require('backbone'));```
 
 
 Usage

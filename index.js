@@ -1,1 +1,1 @@
-require('./backbone-async-event');
+module.exports = require('./backbone-async-event');

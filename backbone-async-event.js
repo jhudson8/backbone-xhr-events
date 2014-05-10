@@ -27,7 +27,9 @@
       main(Backbone, _);
     });
   } else if (typeof exports !== 'undefined' && typeof require !== 'undefined') {
-    main(require('backbone'), require('underscore'));
+    module.exports = function(Backbone) {
+      main(Backbone, require('underscore'));
+    };
   } else {
     main(Backbone, _);
   }
