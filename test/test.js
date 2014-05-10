@@ -18,7 +18,7 @@ var chai = require('chai'),
           options.error && options.error.apply(options, arguments);
         }
       };
-require('../index.js')(Backbone);
+require('../backbone-async-event')
 chai.use(sinonChai);
 Backbone.$ = $;
 
@@ -88,13 +88,17 @@ describe("backbone-async-event", function() {
         events.on('complete', complete);
       });
 
-      model.fetch();
+      var options = {foo: 'bar'};
+      model.fetch(options);
       $.success({});
       expect(success.callCount).to.eql(1);
       expect(success.getCall(0).args[0]).to.eql(model);
+      expect(success.getCall(0).args[1].foo).to.eql('bar');
       expect(error.callCount).to.eql(0);
       expect(complete.callCount).to.eql(1);
       expect(complete.getCall(0).args[0]).to.eql('success');
+      expect(complete.getCall(0).args[1]).to.eql(model);
+      expect(complete.getCall(0).args[2].foo).to.eql('bar');
       expect(complete.getCall(0).args[1]).to.eql(model);
     });
 
@@ -108,17 +112,20 @@ describe("backbone-async-event", function() {
         events.on('complete', complete);
       });
 
-      model.fetch();
-      $.error(1, 2, 3);
+      model.fetch({foo: 'bar'});
+      $.error('xhr', 'errorType', 'thrownError');
       expect(error.callCount).to.eql(1);
       expect(error.getCall(0).args[0]).to.eql(model);
-      expect(error.getCall(0).args[1]).to.eql(1);
-      expect(error.getCall(0).args[2]).to.eql(2);
-      expect(error.getCall(0).args[3]).to.eql(3);
+      expect(error.getCall(0).args[1]).to.eql('errorType');
+      expect(error.getCall(0).args[2]).to.eql('thrownError');
+      expect(error.getCall(0).args[3].foo).to.eql('bar');
       expect(success.callCount).to.eql(0);
       expect(complete.callCount).to.eql(1);
       expect(complete.getCall(0).args[0]).to.eql('error');
       expect(complete.getCall(0).args[1]).to.eql(model);
+      expect(complete.getCall(0).args[2]).to.eql('errorType');
+      expect(complete.getCall(0).args[3]).to.eql('thrownError');
+      expect(complete.getCall(0).args[4].foo).to.eql('bar');
     });
 
     it("implements isLoading to return true if there is any current async activity", function() {

@@ -1,5 +1,5 @@
 /*!
- * backbone-async-event v0.1.0
+ * backbone-async-event v0.1.1
  * 
  * Copyright (c) 2014 Joe Hudson
  * 
@@ -26,6 +26,8 @@
     define(['backbone', 'underscore'], function(Backbone, _) {
       main(Backbone, _);
     });
+  } else if (typeof exports !== 'undefined' && typeof require !== 'undefined') {
+    main(require('backbone'), require('underscore'));
   } else {
     main(Backbone, _);
   }
@@ -58,19 +60,15 @@
           loads.splice(index, 1);
         }
 
-        var _arguments = arguments;
-        _.each([events, allEvents], function(events, index) {
-          var args = _.toArray(_arguments);
+        // trigger the success/error event (args for error: xhr, type, error)
+        var args = (type === 'success') ? [type, model, options] : [type, model, _args[1], _args[2], options];;
+        events.trigger.apply(events, args);
+        allEvents.trigger.apply(allEvents, args);
 
-          // trigger success or error event
-          args.splice(0, 0, type);
-          args.splice(1, 0, model);
-          events.trigger.apply(events, args);
-
-          // trigger the complete event
-          args.splice(0, 0, 'complete');
-          events.trigger.apply(events, args);
-        });
+        // trigger the complete event
+        args.splice(0, 0, 'complete');
+        events.trigger.apply(events, args);
+        allEvents.trigger.apply(allEvents, args);
 
         if (loads.length === 0) {
           model.trigger('async:load-complete');

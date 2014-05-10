@@ -1,4 +1,0 @@
-// commonjs impl for backbone-async-event
-module.exports = function(Backbone) {
-({core})(Backbone, require('underscore'));
-};

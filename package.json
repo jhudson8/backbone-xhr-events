@@ -1,6 +1,6 @@
 {
   "name": "backbone-async-event",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "Joe Hudson <joehud@gmail.com>",
   "description": "asynchronous event triggers for Backbone Model/Collection for decoupled watching of model specific asynchronous activity",
   "repository": {

@@ -1,26 +1,17 @@
 var fs = require('fs'),
     UglifyJS = require('uglify-js');
 
-var version = JSON.parse(fs.readFileSync('./package.json', {encoding: 'utf-8'})).version;
+var name = 'backbone-async-event',
+    file = name + '.js',
+    minimizedFile = name + '.min.js',
+    repo = 'https://github.com/jhudson8/' + name,
+    version = JSON.parse(fs.readFileSync('./package.json', {encoding: 'utf-8'})).version,
+    content = fs.readFileSync(file, {encoding: 'utf8'}),
+    versionMatcher = new RegExp(name + ' v[0-9\.]+');
 
-function wrap(wrapperFile, contents) {
-  var wrapper = fs.readFileSync('./lib/' + wrapperFile + '.wrapper', {encoding: 'utf8'});
-  var parts = wrapper.split('{core}');
-  return replaceTokens(parts[0] + contents + parts[1]);
-}
-
-function write(outfile, wrapper, contents) {
-  fs.writeFileSync('./' + outfile + '.js', wrap(wrapper, contents), {encoding: 'utf8'});  
-}
-
-function replaceTokens(content) {
-  return content.replace('{version}', version);
-}
-
-var contents = fs.readFileSync('./lib/core.js', {encoding: 'utf8'});
-write('backbone-async-event', 'browser', contents);
-write('index', 'commonjs', contents);
+content = content.replace(versionMatcher, name + ' v' + version);
+fs.writeFileSync(file, content, {encoding: 'utf8'});
 
 var minimized = UglifyJS.minify('./backbone-async-event.js');
-var minimizedHeader = '/*!\n * backbone-async-event v' + version + ';  MIT license\n */\n';
+var minimizedHeader = '/*!\n * [backbone-async-event](https://github.com/jhudson8/backbone-async-event) v' + version + ';  MIT license; Joe Hudson<joehud@gmail.com>\n */\n';
 fs.writeFileSync('./backbone-async-event.min.js', minimizedHeader + minimized.code, {encoding: 'utf8'});
