@@ -8,9 +8,11 @@ Installation
 * Browser: backbone-async-event.js/backbone-async-event.min.js; *after* [backbone.js](http://backbonejs.org/)
 * CommonJS: ```require('backbone-async-event');```
 
+
 Usage
 -----
 Any time ajax requests are made using Backbone.sync (all of the backbone ajax requests are), a ```sync``` event and a scoped ```sync:{event name}``` event will be triggered on the model that initiated the ajax requests.
+
 
 Events
 ------
@@ -21,6 +23,23 @@ The ```lifecycle events``` is a [Backbone.Events](http://backbonejs.org/#Events)
 * success(model, options): triggered when/if the ajax request was successful
 * error(model, errorType, thrownError, options): triggered when/if the ajax request failed
 * complete({"error"|"success"}, model[, errorType, thrownError], options); triggered on either success or error
+
+
+Global Event Handler
+--------------------
+Aside from async events being triggered on the model, a global event handler can be used to capture all async events for all models.  The event signature is the same for the model async events except that the first parameter is the model that the async event is associated with.
+```
+Backbone.asyncHandler = myGlobalAsyncHandler;
+// capture all async events for all models
+myGlobalAsyncHandler.on('async', function(asyncEventName, model, lifecycleEvents, options) {
+  ...
+});
+// capture only "read" async events for all models
+myGlobalAsyncHandler.on('async:read', function(model, lifecycleEvents, options) {
+  ...
+});
+```
+
 
 Examples
 --------

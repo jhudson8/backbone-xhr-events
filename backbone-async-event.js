@@ -39,12 +39,16 @@
     options = options || {};
     var loads = model._pendingAsyncEvents = model._pendingAsyncEvents || [],
         eventName = options && options.event || method,
-        events = _.extend({}, Backbone.Events),
-        allEvents = _.extend({}, Backbone.Events);
-    loads.push(allEvents);
+        lifecycleEvents = _.extend({}, Backbone.Events);
+    loads.push(lifecycleEvents);
 
-    model.trigger('async', eventName, events);
-    model.trigger('async:' + eventName, allEvents);
+    model.trigger('async', eventName, lifecycleEvents, options);
+    model.trigger('async:' + eventName, lifecycleEvents, options);
+
+    if (Backbone.asyncHandler) {
+      Backbone.asyncHandler.trigger('async', eventName, model, lifecycleEvents, options);
+      Backbone.asyncHandler.trigger('async:' + eventName, model, lifecycleEvents, options);
+    }
 
     function onComplete(type) {
       var _type = options[type];
@@ -55,24 +59,21 @@
         _type && _type.apply(this, _args);
 
         // remove the load entry
-        var index = loads.indexOf(allEvents);
+        var index = loads.indexOf(lifecycleEvents);
         if (index >= 0) {
           loads.splice(index, 1);
         }
 
         // trigger the success/error event (args for error: xhr, type, error)
         var args = (type === 'success') ? [type, model, options] : [type, model, _args[1], _args[2], options];;
-        events.trigger.apply(events, args);
-        allEvents.trigger.apply(allEvents, args);
+        lifecycleEvents.trigger.apply(lifecycleEvents, args);
 
         // trigger the complete event
         args.splice(0, 0, 'complete');
-        events.trigger.apply(events, args);
-        allEvents.trigger.apply(allEvents, args);
+        lifecycleEvents.trigger.apply(lifecycleEvents, args);
 
         if (loads.length === 0) {
           model.trigger('async:load-complete');
-          delete model._pendingAsyncEvents;
         }
       };
     }

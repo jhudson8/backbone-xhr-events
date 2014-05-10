@@ -157,5 +157,28 @@ describe("backbone-async-event", function() {
       $.error();
       expect(spy.callCount).to.eql(2);
     });
+
+    it("triggers async events for a global async handler", function() {
+      var globalHandler = _.extend({}, Backbone.Events),
+          eventSpy = sinon.spy(),
+          allEventsSpy = sinon.spy();
+      Backbone.asyncHandler = globalHandler;
+      globalHandler.on('async', allEventsSpy);
+      globalHandler.on('async:read', eventSpy);
+
+      model.fetch({foo: 'bar'});
+      expect(eventSpy.callCount).to.eql(1);
+      var args = eventSpy.getCall(0).args;
+      expect(args[0]).to.eql(model);
+      expect(!!args[1].trigger).to.eql(true);
+      expect(args[2].foo).to.eql('bar');
+
+      expect(allEventsSpy.callCount).to.eql(1);
+      args = allEventsSpy.getCall(0).args;
+      expect(args[0]).to.eql('read');
+      expect(args[1]).to.eql(model);
+      expect(!!args[2].trigger).to.eql(true);
+      expect(args[3].foo).to.eql('bar');
+    });
   });
 });
