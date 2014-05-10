@@ -5,7 +5,8 @@ Simple backbone plugin that emits specific events when ajax requests are made.  
 
 Installation
 ------------
-Include backbone-async-event.js *after* backbone.js
+* Browser: backbone-async-event.js/backbone-async-event.min.js; *after* backbone.js
+* CommonJS: ```require('backbone-async-event')(require('backbone'));```
 
 Usage
 -----
@@ -21,10 +22,10 @@ model.on('async', function(eventName, asyncEvents) {
   asyncEvents.on('success', function(model) {
     // the operation was successful and the updated model is provided as a parameter
   });
-  asyncEvents.on('error', function(xhr, status, error) {
+  asyncEvents.on('error', function(model, xhr, status, error) {
     // the operation failed and the parameters are proxied straight from the $.ajax error call
   });
-  asyncEvents.on('complete', function() {
+  asyncEvents.on('complete', function(type (error|success), model, [xhr, status, error]) {
     // the operation was successful or errored and the payload will either look like a success or error payload
   });
 });
@@ -43,8 +44,11 @@ The event name can be overridden by setting the ```event``` attribute on the req
  * save: ```update```
  * destroy: ```delete```
 
-To override, you would do:
+To override the event name, use the ```event``` fetch option.
 ```
 model.fetch({event: 'foo'})
 ```
-
+or call Backbone.sync directly
+```
+Backbone.sync(asyncEvent, model, options);
+```

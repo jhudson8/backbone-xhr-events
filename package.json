@@ -1,0 +1,28 @@
+{
+  "name": "backbone-async-event",
+  "version": "0.1.0",
+  "author": "Joe Hudson <joehud@gmail.com>",
+  "description": "asynchronous event triggers for Backbone",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jhudson8/backbone-async-event.git"
+  },
+  "keywords": [
+    "asynchronous",
+    "ajax",
+    "backbone"
+  ],
+  "dependencies": {
+    "backbone": "*",
+    "underscore": "*"
+  },
+  "analyze": false,
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*",
+    "sinon": "*",
+    "sinon-chai": "*",
+    "uglify-js": "*"
+  },
+  "license": "MIT"
+}
