@@ -1,5 +1,5 @@
 /*!
- * backbone-async-event v0.1.2
+ * backbone-async-event v0.1.3
  * 
  * Copyright (c) 2014 Joe Hudson
  * 
