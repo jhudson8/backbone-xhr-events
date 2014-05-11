@@ -58,7 +58,9 @@
 
         // options callback
         var _args = arguments;
-        _type && _type.apply(this, _args);
+        if (_type) {
+          _type.apply(this, _args);
+        }
 
         // remove the load entry
         var index = loads.indexOf(lifecycleEvents);
@@ -67,7 +69,7 @@
         }
 
         // trigger the success/error event (args for error: xhr, type, error)
-        var args = (type === 'success') ? [type, model, options] : [type, model, _args[1], _args[2], options];;
+        var args = (type === 'success') ? [type, model, options] : [type, model, _args[1], _args[2], options];
         lifecycleEvents.trigger.apply(lifecycleEvents, args);
 
         // trigger the complete event
