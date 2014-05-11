@@ -13,7 +13,6 @@
     "backbone"
   ],
   "dependencies": {
-    "backbone": "*",
     "underscore": "*"
   },
   "analyze": false,
