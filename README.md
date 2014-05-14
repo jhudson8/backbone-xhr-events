@@ -18,8 +18,8 @@ Any time ajax requests are made using Backbone.sync (all of the backbone ajax re
 
 Events
 ------
-* ```sync```: function({event name}, {lifecycle events});
-* ```sync:{event name}```: function({lifecycle events})
+* ```sync```: function({event name}, {lifecycle events}, options);
+* ```sync:{event name}```: function({lifecycle events}, options)
 
 The ```lifecycle events``` is a [Backbone.Events](http://backbonejs.org/#Events).  The follwing events may be triggered:
 * success(model, options): triggered when/if the ajax request was successful
