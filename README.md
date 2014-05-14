@@ -1,7 +1,9 @@
 backbone-async-event
 ====================
 
-Simple backbone plugin that emits specific events when ajax requests are made.  This is meaningful to allow external sources to plug in to the model asynchronous operations.
+***Problem:*** There is no way to tell if a model or collection is currently perform an ajax operation.  And, depending on the operation, there is no way to tell when that operation has been completed.
+
+***Solution:*** Trigger an event on the model or collection to indicate that ajax activity has begun.  Provide as a parameter to this event a Backbone.Events object so that the lifecycie of that specific ajax request can be monitored.
 
 Installation
 ------------
