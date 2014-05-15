@@ -1,9 +1,9 @@
 backbone-async-event
 ====================
 
-***Problem:*** There is no way to tell if a model or collection is currently perform an ajax operation.  And, depending on the operation, there is no way to tell when that operation has been completed.
+***Problem:*** There is no way to tell if a model or collection is currently performing an ajax operation.  And, depending on the operation, there is no way to tell when that operation has been completed.
 
-***Solution:*** Trigger an event on the model or collection to indicate that ajax activity has begun.  Provide as a parameter to this event a Backbone.Events object so that the lifecycie of that specific ajax request can be monitored.
+***Solution:*** Trigger an event on the model or collection to indicate that ajax activity has begun.  Provide as a parameter to this event a Backbone.Events object so that the lifecycle of that specific ajax request can be monitored.
 
 Installation
 ------------
