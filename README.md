@@ -84,3 +84,15 @@ or call Backbone.sync directly
 ```
 Backbone.sync(asyncEventName, model, options);
 ```
+
+
+Ajax Response Interception
+----------------------
+To incercept the ajax request and override the response (for example to incorporate a client response cache), the ```intercept``` attribute can be set on the sync options data with a function which is expected to either call options.success or options.error with a simulated response.
+```
+App.on('async', function(event, model, lifecycle, options) {
+  options.intercept = function() {
+    options.success(...);
+  }
+});
+```

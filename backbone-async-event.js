@@ -44,6 +44,9 @@
         eventName = options && options.event || method,
         lifecycleEvents = _.extend({}, Backbone.Events);
     loads.push(lifecycleEvents);
+    lifecycleEvents.method = method;
+    lifecycleEvents.options = options;
+    lifecycleEvents.model = model;
 
     model.trigger('async', eventName, lifecycleEvents, options);
     model.trigger('async:' + eventName, lifecycleEvents, options);
@@ -85,6 +88,14 @@
     onComplete('success');
     onComplete('error');
 
+    var intercept = options.intercept;
+    if (intercept) {
+      if (typeof intercept === 'function') {
+        return intercept(options);
+      } else {
+        throw "intercept must be function(options)";
+      }
+    }
     _sync.call(this, method, model, options);
   };
 
