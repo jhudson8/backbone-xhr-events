@@ -1,5 +1,5 @@
 /*!
- * backbone-async-event v0.1.3
+ * backbone-async-event v0.2.0
  * https://github.com/jhudson8/backbone-async-event
  * 
  * Copyright (c) 2014 Joe Hudson<joehud_AT_gmail.com>
