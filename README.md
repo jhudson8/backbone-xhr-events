@@ -54,6 +54,8 @@ Additional Model/Collection methods
 A couple helper methods have been included to Backbone.Model and Backbone.Collection.
 
 * ```isLoading()```: return a truthy (array of async events) if the Model/Collection has any current async activity
+* ```hasBeenFetched()```: return true if the Model/Collection has previously been fetched (and the fetch response occured)
+
 
 Examples
 --------
