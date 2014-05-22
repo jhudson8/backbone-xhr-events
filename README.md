@@ -42,6 +42,13 @@ myGlobalAsyncHandler.on('async:read', function(model, lifecycleEvents, options) 
 });
 ```
 
+Alternatively, ```Backbone.async``` is already available and will fire all events that a global event handler would.
+```
+Backbone.async.on('async:read', function(model, lifecycleEvents, options) {
+  ...
+});
+```
+
 
 Examples
 --------

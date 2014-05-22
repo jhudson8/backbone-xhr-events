@@ -37,6 +37,7 @@
 })(function(Backbone, _) {
   // allow backbone to send async events on models
   var _sync = Backbone.sync;
+  Backbone.async = _.extend({}, Backbone.Events);
   Backbone.sync = function(method, model, options) {
 
     options = options || {};
@@ -51,10 +52,12 @@
     model.trigger('async', eventName, lifecycleEvents, options);
     model.trigger('async:' + eventName, lifecycleEvents, options);
 
-    if (Backbone.asyncHandler) {
-      Backbone.asyncHandler.trigger('async', eventName, model, lifecycleEvents, options);
-      Backbone.asyncHandler.trigger('async:' + eventName, model, lifecycleEvents, options);
-    }
+    _.each([Backbone.async, Backbone.asyncHandler], function(handler) {
+      if (handler) {
+        handler.trigger('async', eventName, model, lifecycleEvents, options);
+        handler.trigger('async:' + eventName, model, lifecycleEvents, options);
+      }
+    });
 
     function onComplete(type) {
       var _type = options[type];
