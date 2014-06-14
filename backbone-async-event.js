@@ -39,7 +39,6 @@
   var _sync = Backbone.sync;
   Backbone.async = _.extend({}, Backbone.Events);
   Backbone.sync = function(method, model, options) {
-
     options = options || {};
     // Ensure that we have a URL.
     if (!options.url) {
@@ -67,7 +66,6 @@
     function onComplete(type) {
       var _type = options[type];
       options[type] = function() {
-
         // options callback
         var _args = arguments;
         if (_type) {
