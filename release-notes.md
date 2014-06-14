@@ -2,7 +2,15 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.3.0...master)
+[Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.4.0...master)
+
+## v0.4.0 - June 14th, 2014
+- update README for hasBeenFetched/hadFetchError - f97acfd
+- add Model/Collection.hasFetchError - d31b0af
+- change Model/Collection.hasBeenFetched() to Model/Collection.hasBeenFetched (boolean rather than function) - d3f4ad6
+- make sure options.url exists before firing events - d0235a1
+
+[Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.3.0...v0.4.0)
 
 ## v0.3.0 - May 22nd, 2014
 - add "hasBeenFetched" to Backbone.Model and Backbone.Collection - da4ce8e
