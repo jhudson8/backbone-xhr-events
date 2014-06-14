@@ -119,7 +119,10 @@
   Backbone.async.on('async:read', function(model, events) {
     events.on('success', function() {
       model.hasBeenFetched = true;
+      model.hadFetchError = false;
     });
+    events.on('error', function() {
+      model.hadFetchError = true;
     });
   });
 });
