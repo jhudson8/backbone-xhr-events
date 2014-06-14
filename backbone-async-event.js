@@ -115,13 +115,11 @@
       }
       return false;
     };
-    clazz.prototype.hasBeenFetched = function() {
-      return this._fetched;
-    };
   });
   Backbone.async.on('async:read', function(model, events) {
     events.on('success', function() {
-      model._fetched = true;
-    })
+      model.hasBeenFetched = true;
+    });
+    });
   });
 });
