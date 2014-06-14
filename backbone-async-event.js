@@ -41,6 +41,11 @@
   Backbone.sync = function(method, model, options) {
 
     options = options || {};
+    // Ensure that we have a URL.
+    if (!options.url) {
+      options.url = _.result(model, 'url');
+    }
+
     var loads = model._pendingAsyncEvents = model._pendingAsyncEvents || [],
         eventName = options && options.event || method,
         lifecycleEvents = _.extend({}, Backbone.Events);
