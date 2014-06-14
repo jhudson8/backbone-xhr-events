@@ -49,12 +49,13 @@ Backbone.async.on('async:read', function(model, lifecycleEvents, options) {
 });
 ```
 
-Additional Model/Collection methods
+Additional Model/Collection behavior
 --------------------
 A couple helper methods have been included to Backbone.Model and Backbone.Collection.
 
 * ```isLoading()```: return a truthy (array of async events) if the Model/Collection has any current async activity
-* ```hasBeenFetched()```: return true if the Model/Collection has previously been fetched (and the fetch response occured)
+* ```hasBeenFetched```: true if the Model/Collection has previously been fetched (and the fetch response occured)
+* ```hadFetchError```: true if the Model/Collection has a fetch error and no successful fetch after
 
 
 Examples
