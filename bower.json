@@ -1,0 +1,28 @@
+{
+  "name": "backbone-async-event",
+  "main": "backbone-async-event.js",
+  "version": "0.4.0",
+  "homepage": "https://github.com/jhudson8/backbone-async-event",
+  "authors": [
+    "Joe Hudson <joehud@gmail.com>"
+  ],
+  "description": "backbone plugin that emits specific events when ajax requests are made",
+  "moduleType": [
+    "amd",
+    "globals"
+  ],
+  "keywords": [
+    "backbone",
+    "ajax",
+    "event",
+    "plugin"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
