@@ -5,6 +5,9 @@ backbone-async-event
 
 ***Solution:*** Trigger an event on the model or collection to indicate that ajax activity has begun.  Provide as a parameter to this event a Backbone.Events object so that the lifecycle of that specific ajax request can be monitored.
 
+***To see an example app using this (and other react plugins working together), [check this out](https://github.com/jhudson8/react-plugins-united-example)***
+
+
 Installation
 ------------
 * Browser: backbone-async-event.js/backbone-async-event.min.js; *after* [backbone.js](http://backbonejs.org/)
