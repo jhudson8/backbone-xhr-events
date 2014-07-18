@@ -18,7 +18,7 @@ Installation
 API: Events
 --------
 
-### Model / Collection
+### Model / Collection Events
 
 #### async (eventName, lifecycleEvents, options)
 * ***eventName***: the Backbone sync event name (```read```, ```update``` or ```delete```)
@@ -65,7 +65,7 @@ model.on('async:read', function(lifecycleEvents) {
 API
 --------
 
-### Model / Collection
+### Model / Collection API
 
 #### isLoading ()
 return a truthy (array of async events) if the Model/Collection has any current async activity
