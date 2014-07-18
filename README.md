@@ -9,6 +9,11 @@ Give your [backbone.js](http://backbonejs.org/) models and collections events to
 Any time ajax requests are made using Backbone.sync (all of the backbone ajax requests are), a ```sync``` event and a scoped ```sync:{event name}``` event will be triggered on the model that initiated the ajax requests.
 
 
+Docs
+-------------
+Instead of reading this README file, you can [view it in fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-async-event) for a better experience.
+
+
 Installation
 ------------
 * Browser: backbone-async-event.js/backbone-async-event.min.js; *after* [backbone.js](http://backbonejs.org/)
