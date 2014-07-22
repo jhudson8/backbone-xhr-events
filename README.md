@@ -8,7 +8,7 @@ To provide this functionality in a decoupled way, we add events that are trigger
 
 This is used, for example, in the [jhudson8/react-backbone](https://github.com/jhudson8/react-backbone) project to allow UI components to know when their associated models are doing something that should require a loading indicator to be displayed.
 
-[View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/react-backbone)
+[View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-async-event)
 
 
 API: Events
