@@ -21,7 +21,8 @@
     "mocha": "*",
     "sinon": "*",
     "sinon-chai": "*",
-    "uglify-js": "*"
+    "uglify-js": "*",
+    "backbone": "*"
   },
   "license": "MIT"
 }

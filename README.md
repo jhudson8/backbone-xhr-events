@@ -1,151 +1,175 @@
 backbone-async-event
 ====================
+Do more than what the default Backbone Model/Collection ```request``` event does for you.  The primary benefits are
+
+* Use events to bind to ```success```/```error```/```complete``` events for each request (and an additional ```data``` event)
+* Emit type specific XHR events to allow for focused binding
+* Give ability to see if a model currently has any pending XHR activity
+* Provide a global event bus to bind to all Model/Collection XHR activity
+* Allow requests to be intercepted to, for example, return cached content
+* Provide an additional ```data``` event to intercept and override response data before it is returned to the Model/Collection
+* Provide event forwarding capabilities so other objects can simulate XHR activity to match another Model/Collection
+* Make all event names and additional attributes overrideable to meet the needs of your particular project
+
 Give external entities a way to monitor ajax activity on your [backbone.js](http://backbonejs.org/).Collections and [backbone.js](http://backbonejs.org/).Models.
 
-With standard Backbone, there is no way to tell if a model or collection is currently performing a fetch, save or destroy (unless you provided callback options when that operation was called).
 
-To provide this functionality in a decoupled way, we add events that are triggered on your Backbone.Model or Backbone.Collection signaling this ajax activity, giving an access point to listen for the response to occur.
-
-This is used, for example, in the [jhudson8/react-backbone](https://github.com/jhudson8/react-backbone) project to allow UI components to know when their associated models are doing something that should require a loading indicator to be displayed.
-
-[View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-async-event)
-
-
-API: Events
---------
-
-### Model / Collection Events
-
-#### async (eventName, lifecycleEvents, options)
-* ***eventName***: the Backbone sync event name (```read```, ```update``` or ```delete```)
-* ***lifecycleEvents***: a Backbone.Events object used to bind to specific request ```success```, ```error``` and ```complete``` events
-* ***options***: the fetch/save/destroy options
-
-The follwing event names may be bound on ```lifecycleEvents```
-
-* ***success***: (model, options); triggered when/if the ajax request was successful
-* ***error***: (model, errorType, thrownError, options); triggered when/if the ajax request failed
-* ***complete***; ({"error"|"success"}, model[, errorType, thrownError], options); triggered on either success or error
-
-##### Examples
-```
-    model.on('async', function(eventName, lifecycleEvents) {
-      lifecycleEvents.on('success', function(model, options) {
-        // the operation was successful and the updated model is provided as a parameter
-      });
-      lifecycleEvents.on('error', function(model, errorType, error, options) {
-        // the operation failed and the parameters are proxied straight from the $.ajax error call
-      });
-      lifecycleEvents.on('complete', function(type, model) {
-        // the operation was successful or errored and the payload will either look like a success or error payload
-        // type is either "success" or "error"
-      });
-    });
-```
-
-
-#### async:{eventName} (lifecycleEvents, options)
-* ***eventName***: the Backbone sync event name (```read```, ```update``` or ```delete```)
-* ***lifecycleEvents***: a Backbone.Events object used to bind to specific request ```success```, ```error``` and ```complete``` events
-* ***options***: the fetch/save/destroy options
-
-Same as ```async``` but is only triggered for the specified event name
-
-##### Example
-```
-    model.on('async:read', function(lifecycleEvents) {
-      // notice that the event name is not provided to this function
-    });
-```
-
-
-API
---------
-
-### Model / Collection API
-
-#### isLoading ()
-return a truthy (array of async events) if the Model/Collection has any current async activity
-
-##### Example
-```
-    model.fetch();
-    // or
-    model.save();
-    // or
-    model.destroy();
-    // model.isLoading() == true
-```
-
-#### hasBeenFetched ()
-return true if the Model/Collection has previously been fetched (and the fetch response occured)
-
-##### Example
-```
-    model.fetch()
-    // model.hasBeenFetched() === false;
-    // now, once the model fetch success callback has executed
-    // model.hasBeenFetched() === true;
-```
-
-#### hadFetchError ()
-return true if the Model/Collection has a fetch error and has had no successful fetch since the error.
+[View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-async-event) (a friendlier view of the information below)
 
 
 Sections
-----------
-
-### Installation
-* Browser: backbone-async-event.js/backbone-async-event.min.js; *after* [backbone.js](http://backbonejs.org/)
-* CommonJS: ```require('backbone-async-event')(require('backbone'));```
-
-
-### Event Names
-The async event name can be overridden by setting the ```event``` attribute on the request options but otherwise it will be:
-
- * ***fetch***: read
- * ***save***: update
- * ***destroy***: delete
-
-To override the event name, use the ```event``` fetch option.
+--------
+### General Usage Examples
+Bind to a model to listen to all XHR activity
 ```
-    model.fetch({event: 'aDifferentAsyncEventName'})
+model.on('xhr', function(type, context) {
+  // type is (by default) "read", "save", or "delete"
+  // context is a Backbone.Events to bind to XHR lifecycle events
+  context.on('complete', function() {
+    // this will be called when the XHR succeeds or fails
+  });
+  context.on('success', function(model) {
+    // this will be called after the XHR succeeds
+  });
+});
 ```
 
-or call Backbone.sync directly
+Bind to a model to listen to only fetches
 ```
-    Backbone.sync('aDifferentAsyncEventName', model, options);
-```
-
-
-### Global Event Handler
-Aside from async events being triggered on the model, a global event handler can be used to capture all async events for all models.  The event signature is the same for the model async events except that the first (or second) parameter is the model that the async event initiated from.
-```
-    Backbone.asyncHandler = myGlobalAsyncHandler;
-    // capture all async events for all models
-    myGlobalAsyncHandler.on('async', function(asyncEventName, model, lifecycleEvents, options) {
-      ...
-    });
-    // capture only "read" async events for all models
-    myGlobalAsyncHandler.on('async:read', function(model, lifecycleEvents, options) {
-      ...
-    });
+model.on('xhr:read', function(context) {
+  ...
+});
 ```
 
-Alternatively, ```Backbone.async``` is already available and will fire all events that a global event handler would.
+Override the XHR result
 ```
-    Backbone.async.on('async:read', function(model, lifecycleEvents, options) {
-      ...
-    });
+model.on('xhr', function(type, context) {
+  context.on('data', function(data, status, xhr, context) {
+    // wrap the response as a "response" attribute
+    context.response = {response: data};
+  });
+});
 ```
 
+Set a default timeout on all XHR activity
+```
+Backbone.xhrEvents.on('xhr', function(type, model, context) {
+  context.options.timeout = 3000;
+});
+```
 
-### Ajax Response Interception
-To incercept the ajax request and override the response (for example to incorporate a client response cache), the ```intercept``` attribute can be set on the sync options data with a function which is expected to either call options.success or options.error with a simulated response.
+Intercept a request and return a cached result
 ```
-    App.on('async', function(event, model, lifecycle, options) {
-      options.intercept = function() {
-        options.success(...);
-      }
-    });
+Backbone.xhrEvents.on('xhr', function(type, model, context) {
+  var url = context.options.url;
+  var cachedResult = _cache[url];
+  context.intercept = function(options) {
+    options.success(cachedResult, 'success');
+  }
+});
 ```
+
+Determine fetch status of a model
+```
+model.fetch();
+!!model._xhrLoading === true;
+
+// model fetch complete now
+!!model._xhrLoading === false;
+
+// if the model fetch succeeded
+model.hasBeenFetched === true;
+model.hadFetchError === false;
+
+// if the model fetch has failed...
+model.hadFetchError === true;
+model.hasBeenFetched === false;
+```
+
+Forward xhr events to another model
+(source model will continue to emit xhr events as well)
+```
+// forward all events
+Backbone.forwardXhrEvents(sourceModel, receiverModel);
+// stop forwarding all events
+Backbone.stopXhrForwarding(sourceModel, receiverModel);
+
+// forward events for a specific type
+Backbone.forwardXhrEvents(sourceModel, receiverModel, 'read');
+// stop forwarding all events
+Backbone.stopXhrForwarding(sourceModel, receiverModel, 'read');
+
+// forward events *only while the callback function is executed*
+Backbone.forwardXhrEvents(sourceModel, receiverModel, function() {
+  // any XHR activity that sourceModel executes will be emitted by
+  // receiverModel as well
+});
+```
+
+### Request Context
+All XHR events provide a ```context``` as a parameter.  This is an object extending Backbone.Events and is used to bind to the XHR lifecycle events including
+* ***success***: when the XHR has completed sucessfully
+* ***error***: when the XHR has failed
+* ***complete***: when the XHR has either failed or succeeded
+* ***data***: before the model has handled the response
+
+In addition, the following attributes are available
+* ***options***: the Backbone.ajax options
+* ***intercept***: set this value with a callback function(options) which will prevent further execution and execute the callback
+* ***xhr***: the actual XMLHttpRequest
+* ***method***: the Backbone.sync method
+* ***model***: the associated model
+
+
+API: Events
+-----------
+### Model / Collection events
+
+#### "xhr" (method, context)
+* ***method***: the Backbone sync method (by default, "read", "update", or "delete")
+* ***context***: the request context (see "Request Context" section)
+
+Emitted when any XHR activity occurs
+
+#### "xhr:{method}" (context)
+* ***method***: the Backbone sync method (by default, "read", "update", or "delete")
+* ***context***: the request context (see "Request Context" section)
+
+Emitted when only XHR activity matching the method in the event name occurs
+
+### "xhr:complete" ()
+
+Emitted when any XHR activity has completed and there is no more concurrent XHR activity
+
+
+### Backbone.xhrEvents (global events)
+
+#### "xhr" (method, model, context)
+* ***method***: the Backbone sync method (by default, "read", "update", or "delete")
+* ***model***: the associated model
+* ***context***: the request context (see "Request Context" section)
+
+Emitted when any XHR activity occurs
+
+#### "xhr:{method}" (model, context)
+* ***model***: the associated model
+* ***context***: the request context (see "Request Context" section)
+
+Emitted when only XHR activity matching the method in the event name occurs
+
+
+### Backbone methods
+#### forwardXhrEvents (sourceModel, destModel[, method]) or (sourceModel, destModel, autoStopFunc)
+* ***sourceModel***: the originator model of the XHR events
+* ***destModel***: the receiver or proxy of the source model XHR events
+* ***method***: the optional Backbone.sync method to filter the forwarded events
+* ***autoStopFunc***: callback function that, if provided, will stop the forwarding after the function completes execution
+
+Forward XHR events that originate in ```sourceModel``` to ```destModel```.  These events will also be emitted in ```sourceModel``` as well.
+
+#### stopXhrForwarding (sourceModel, destModel[, method])
+* ***sourceModel***: the originator model of the XHR events
+* ***destModel***: the receiver or proxy of the source model XHR events
+* ***method***: the optional Backbone.sync method to filter the forwarded events
+
+Stop forwarding XHR events
