@@ -22,14 +22,19 @@ Sections
 ### General Usage Examples
 Bind to a model to listen to all XHR activity
 ```
-model.on('xhr', function(type, context) {
-  // type is (by default) "read", "save", or "delete"
+model.on('xhr', function(method, context) {
+  // method is "read", "save", or "delete" or custom (Backbone.sync method)
   // context is a Backbone.Events to bind to XHR lifecycle events
-  context.on('complete', function() {
+
+  context.on('complete', function(type, {type specific args}) {
+    // type will either be "success" or "error" and the type specific args are the same as what is provided to the respective events
     // this will be called when the XHR succeeds or fails
   });
   context.on('success', function(model) {
     // this will be called after the XHR succeeds
+  });
+  context.on('error', function(model, xhr, type, error) {
+    // this will be called if the XHR fails
   });
 });
 ```
@@ -102,7 +107,7 @@ Backbone.forwardXhrEvents(sourceModel, receiverModel);
 // stop forwarding all events
 Backbone.stopXhrForwarding(sourceModel, receiverModel);
 
-// forward events for a specific type
+// forward events for a specific Backbone.sync method
 Backbone.forwardXhrEvents(sourceModel, receiverModel, 'read');
 // stop forwarding all events
 Backbone.stopXhrForwarding(sourceModel, receiverModel, 'read');
