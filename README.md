@@ -41,30 +41,38 @@ model.on('xhr:read', function(context) {
 });
 ```
 
-Override the XHR result
+Override the XHR payload or cache it
 ```
-model.on('xhr', function(type, context) {
+model.on('xhr', function(method, context) {
   context.on('data', function(data, status, xhr, context) {
     // wrap the response as a "response" attribute
-    context.response = {response: data};
+    context.response = { response: data };
+    // cache the response
+    if (method === 'read') {
+      _cacheFetchResponse(data);
+    }
   });
 });
 ```
 
 Set a default timeout on all XHR activity
 ```
-Backbone.xhrEvents.on('xhr', function(type, model, context) {
+Backbone.xhrEvents.on('xhr', function(method, model, context) {
   context.options.timeout = 3000;
 });
 ```
 
-Intercept a request and return a cached result
+Intercept a request and return a cached payload
 ```
-Backbone.xhrEvents.on('xhr', function(type, model, context) {
+Backbone.xhrEvents.on('xhr', function(method, model, context) {
   var url = context.options.url;
-  var cachedResult = _cache[url];
-  context.intercept = function(options) {
-    options.success(cachedResult, 'success');
+  if (context.method === 'read') {
+    var cachedResult = _getFetchCache(url);
+    if (cachedResult) {
+      context.intercept = function(options) {
+        options.success(cachedResult, 'success');
+      }  
+    }
   }
 });
 ```
@@ -72,10 +80,10 @@ Backbone.xhrEvents.on('xhr', function(type, model, context) {
 Determine fetch status of a model
 ```
 model.fetch();
-!!model._xhrLoading === true;
+!!model.xhrActivity === true;
 
 // model fetch complete now
-!!model._xhrLoading === false;
+!!model.xhrActivity === false;
 
 // if the model fetch succeeded
 model.hasBeenFetched === true;

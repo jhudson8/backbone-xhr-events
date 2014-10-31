@@ -146,15 +146,15 @@ describe("backbone-xhr-events", function () {
     });
 
     it("use loading to return true if there is any current xhr activity", function () {
-      expect(model._xhrLoading).to.eql(undefined);
+      expect(model.xhrActivity).to.eql(undefined);
       model.fetch();
-      expect(!!model._xhrLoading).to.eql(true);
+      expect(!!model.xhrActivity).to.eql(true);
       $.success();
-      expect(model._xhrLoading).to.eql(undefined);
+      expect(model.xhrActivity).to.eql(undefined);
       model.fetch();
-      expect(!!model._xhrLoading).to.eql(true);
+      expect(!!model.xhrActivity).to.eql(true);
       $.error();
-      expect(model._xhrLoading).to.eql(undefined);
+      expect(model.xhrActivity).to.eql(undefined);
     });
 
     it("triggers 'data' before 'success'", function () {
@@ -252,8 +252,8 @@ describe("backbone-xhr-events", function () {
       source.fetch();
       expect(eventSpy.callCount).to.eql(1);
       expect(source.hasBeenFetched).to.eql(undefined);
-      expect(source._xhrLoading.length).to.eql(1);
-      expect(receiver._xhrLoading.length).to.eql(1);
+      expect(source.xhrActivity.length).to.eql(1);
+      expect(receiver.xhrActivity.length).to.eql(1);
       $.success({});
       expect(successSpy.callCount).to.eql(1);
       expect(successModel).to.eql(source);
@@ -261,14 +261,14 @@ describe("backbone-xhr-events", function () {
       expect(receiver.hasBeenFetched).to.eql(undefined);
       expect(receiverCompleteSpy.callCount).to.eql(1);
       expect(sourceCompleteSpy.callCount).to.eql(1);
-      expect(source._xhrLoading).to.eql(undefined);
-      expect(receiver._xhrLoading).to.eql(undefined);
+      expect(source.xhrActivity).to.eql(undefined);
+      expect(receiver.xhrActivity).to.eql(undefined);
 
       // make sure things still work the next time
       source.fetch();
       expect(eventSpy.callCount).to.eql(2);
-      expect(source._xhrLoading.length).to.eql(1);
-      expect(receiver._xhrLoading.length).to.eql(1);
+      expect(source.xhrActivity.length).to.eql(1);
+      expect(receiver.xhrActivity.length).to.eql(1);
       $.success({});
       expect(successSpy.callCount).to.eql(2);
       expect(receiverCompleteSpy.callCount).to.eql(2);
@@ -278,8 +278,8 @@ describe("backbone-xhr-events", function () {
       Backbone.stopXhrForwarding(source, receiver);
       source.fetch();
       expect(eventSpy.callCount).to.eql(2);
-      expect(source._xhrLoading.length).to.eql(1);
-      expect(receiver._xhrLoading).to.eql(undefined);
+      expect(source.xhrActivity.length).to.eql(1);
+      expect(receiver.xhrActivity).to.eql(undefined);
       $.success({});
       expect(successSpy.callCount).to.eql(2);
       expect(receiverCompleteSpy.callCount).to.eql(2);

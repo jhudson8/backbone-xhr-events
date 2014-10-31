@@ -40,7 +40,7 @@
   // Backbone.xhrCompleteEventName: event triggered on models when all XHR requests have been completed
   var xhrCompleteEventName = Backbone.xhrCompleteEventName = Backbone.xhrCompleteEventName || 'xhr:complete';
   // the model attribute which can be used to return an array of all current XHR request events
-  var xhrLoadingAttribute = Backbone.xhrModelLoadingAttribute = Backbone.xhrModelLoadingAttribute || '_xhrLoading';
+  var xhrLoadingAttribute = Backbone.xhrModelLoadingAttribute = Backbone.xhrModelLoadingAttribute || 'xhrActivity';
   // Backbone.xhrEventName: the event triggered on models and the global bus to signal an XHR request
   var xhrEventName = Backbone.xhrEventName = Backbone.xhrEventName || 'xhr';
   // Backbone.xhrGlobalAttribute: global event handler attribute name (on Backbone) used to subscribe to all model xhr events
