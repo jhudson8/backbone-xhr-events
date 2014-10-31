@@ -70,7 +70,7 @@
       if (_.isFunction(intercept)) {
         return intercept(options);
       } else {
-        throw "intercept must be function(options)";
+        throw new Error("intercept must be function(options)");
       }
     }
     context.xhr = _sync.call(this, method, model, options);
