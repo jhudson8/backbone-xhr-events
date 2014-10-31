@@ -10,8 +10,7 @@ Do more than what the default Backbone Model/Collection ```request``` event does
 * Provide an additional ```data``` event to intercept and override response data before it is returned to the Model/Collection
 * Provide event forwarding capabilities so other objects can simulate XHR activity to match another Model/Collection
 * Make all event names and additional attributes overrideable to meet the needs of your particular project
-
-Give external entities a way to monitor ajax activity on your [backbone.js](http://backbonejs.org/).Collections and [backbone.js](http://backbonejs.org/).Models.
+* Give external entities a way to monitor ajax activity on your [backbone.js](http://backbonejs.org/).Collections and [backbone.js](http://backbonejs.org/).Models.
 
 
 [View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-async-event) (a friendlier view of the information below)
