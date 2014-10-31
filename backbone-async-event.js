@@ -166,7 +166,7 @@
           context.trigger('data', p1, p2, p3, context);
           p1 = context.response || p1;
           // if lifecycleEvents.stop is set, it is assumed that the option success or callback will be manually called
-          if (context.stop) {
+          if (context.preventDefault) {
             return;
           }
         }

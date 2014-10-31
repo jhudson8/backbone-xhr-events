@@ -60,6 +60,21 @@ model.on('xhr', function(method, context) {
 });
 ```
 
+Make a successful XHR look like a failure
+```
+model.on('xhr', function(method, context) {
+  context.on('data', function(data, status, xhr, context) {
+    if (!context.preventDefault) {
+      // we don't want to call success/error callback more than once
+      context.preventDefault = true;
+
+      // provide the parameters that you would have wanted coming back directly from the $.ajax callback
+      context.options.error(...);
+    }
+  });
+});
+```
+
 Set a default timeout on all XHR activity
 ```
 Backbone.xhrEvents.on('xhr', function(method, model, context) {
@@ -126,12 +141,15 @@ All XHR events provide a ```context``` as a parameter.  This is an object extend
 * ***complete***: when the XHR has either failed or succeeded
 * ***data***: before the model has handled the response
 
-In addition, the following attributes are available
+In addition, the following read only attributes are applicable
 * ***options***: the Backbone.ajax options
-* ***intercept***: set this value with a callback function(options) which will prevent further execution and execute the callback
 * ***xhr***: the actual XMLHttpRequest
 * ***method***: the Backbone.sync method
 * ***model***: the associated model
+
+These attributes can be set on the context to alter lifecycle behavior
+* ***intercept***: set this value with a callback function(options) which will prevent further execution and execute the callback
+* ***preventDefault***: set this value as true when binding to the 'data' event if you want to alter success/error behavior (you must call options.success or options.error manually)
 
 
 API: Events
