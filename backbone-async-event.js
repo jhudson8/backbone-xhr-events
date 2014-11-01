@@ -186,7 +186,7 @@
         // if there are no more cuncurrent XHRs, model[xhrLoadingAttribute] should always be undefind
         if (loads.length === 0) {
           model[xhrLoadingAttribute] = undefined;
-          model.trigger(xhrCompleteEventName);
+          model.trigger(xhrCompleteEventName, context);
         }
 
         // trigger the success/error event
