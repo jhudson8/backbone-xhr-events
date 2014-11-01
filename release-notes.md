@@ -5,24 +5,16 @@
 [Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.5.0...master)
 
 ## v0.5.0 - November 1st, 2014
-- update README - e768a66
-- add context to xhr:complete event - f9c0173
-- throw Error - d1eb244
-- readme - 70dd93a
-- preventDefault - 4ccf2a5
-- update docs - 57c21cd
-- change _xhrLoading to xhrActivity - ca9b666
-- massive rewrite and feature changes.  completely not backwards compatible - 353166a
-- update fancydocs link - d660233
-- update README - 02fd108
-- Update README.md - 6162693
-- update README - a04862a
-- update README - 2428003
-- Update README.md - b3d3e5d
-- bower.json - 73f5d26
+Large rewrite with additional features / existing features are *not* backwards compatible
+*note: this is the last release of backbone-async-event.  The project will be renamed to backbone-xhr-events
 
-Compatibility notes:
-- TODO : What might have broken?
+- allow event names and referenced attributes to be overridden
+- use "xhr" instead of "async" for event names
+- change signature of all event parameters
+- provide event forwarding capabilities
+- additional 'data' context event
+
+Your best bet is to look at the updated README file to see the new features
 
 [Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.4.0...v0.5.0)
 

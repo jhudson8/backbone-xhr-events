@@ -1,7 +1,7 @@
 {
   "name": "backbone-async-event",
   "main": "backbone-async-event.js",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "homepage": "https://github.com/jhudson8/backbone-async-event",
   "authors": [
     "Joe Hudson <joehud@gmail.com>"
