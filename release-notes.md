@@ -2,7 +2,29 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.4.0...master)
+[Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.5.0...master)
+
+## v0.5.0 - November 1st, 2014
+- update README - e768a66
+- add context to xhr:complete event - f9c0173
+- throw Error - d1eb244
+- readme - 70dd93a
+- preventDefault - 4ccf2a5
+- update docs - 57c21cd
+- change _xhrLoading to xhrActivity - ca9b666
+- massive rewrite and feature changes.  completely not backwards compatible - 353166a
+- update fancydocs link - d660233
+- update README - 02fd108
+- Update README.md - 6162693
+- update README - a04862a
+- update README - 2428003
+- Update README.md - b3d3e5d
+- bower.json - 73f5d26
+
+Compatibility notes:
+- TODO : What might have broken?
+
+[Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.4.0...v0.5.0)
 
 ## v0.4.0 - June 14th, 2014
 - update README for hasBeenFetched/hadFetchError - f97acfd
