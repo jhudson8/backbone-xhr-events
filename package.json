@@ -1,16 +1,18 @@
 {
-  "name": "backbone-async-event",
+  "name": "backbone-xhr-events",
   "version": "0.5.0",
   "author": "Joe Hudson <joehud@gmail.com>",
-  "description": "asynchronous event triggers for Backbone Model/Collection for decoupled watching of model specific asynchronous activity",
+  "description": "Backbone plugin giving you full featured XHR observer capabilities",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jhudson8/backbone-async-event.git"
+    "url": "https://github.com/jhudson8/backbone-xhr-events.git"
   },
   "keywords": [
-    "asynchronous",
-    "ajax",
-    "backbone"
+    "XHR",
+    "XMLHTTPRequest",
+    "event",
+    "backbone",
+    "plugin"
   ],
   "dependencies": {
     "underscore": "*"

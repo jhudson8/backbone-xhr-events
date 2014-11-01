@@ -1,4 +1,4 @@
-backbone-async-event
+backbone-xhr-events
 ====================
 Do more than what the default [Backbone](http://http://backbonejs.org/) Model/Collection ```request``` event does for you.  The primary benefits are
 
@@ -13,7 +13,7 @@ Do more than what the default [Backbone](http://http://backbonejs.org/) Model/Co
 * Give external entities a way to monitor ajax activity on your Collections and Models
 
 
-[View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-async-event)
+[View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-xhr-events)
 
 
 Sections

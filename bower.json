@@ -1,20 +1,21 @@
 {
-  "name": "backbone-async-event",
-  "main": "backbone-async-event.js",
+  "name": "backbone-xhr-events",
+  "main": "backbone-xhr-events.js",
   "version": "0.5.0",
-  "homepage": "https://github.com/jhudson8/backbone-async-event",
+  "homepage": "https://github.com/jhudson8/backbone-xhr-events",
   "authors": [
     "Joe Hudson <joehud@gmail.com>"
   ],
-  "description": "backbone plugin that emits specific events when ajax requests are made",
+  "description": "Backbone plugin giving you full featured XHR observer capabilities",
   "moduleType": [
     "amd",
     "globals"
   ],
   "keywords": [
-    "backbone",
-    "ajax",
+    "XHR",
+    "XMLHTTPRequest",
     "event",
+    "backbone",
     "plugin"
   ],
   "license": "MIT",
