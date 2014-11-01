@@ -2,7 +2,15 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.5.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.6.0...master)
+
+## v0.6.0 - November 1st, 2014
+- rename to backbone-xhr-events - 5b7d4be
+
+Compatibility notes:
+- TODO : What might have broken?
+
+[Commits](https://github.com/jhudson8/backbone-async-event/compare/v0.5.0...v0.6.0)
 
 ## v0.5.0 - November 1st, 2014
 Large rewrite with additional features / existing features are *not* backwards compatible
