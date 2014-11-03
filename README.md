@@ -225,6 +225,15 @@ Emitted when only XHR activity matching the method in the event name occurs
 
 API
 -----------
+### Backbone.Model / Backbone.Collection
+
+#### whenFetched (successCallback, errorCallback)
+* ***successCallback***: function to be called when the model/collection has been fetched
+* ***errorCallback***: function to be called when if model/collection fetch failed
+
+Initiate a fetch if not already fetching or fetched.  Once the model/collection has been fetch, execute the appropriate callback.
+
+
 ### Backbone
 
 #### forwardXhrEvents (sourceModel, destModel[, method]) or (sourceModel, destModel, autoStopFunc)

@@ -89,6 +89,27 @@
   });
 
 
+  // execute the callback directly if the model is fetch
+  // initiate a fetch with this callback as the success option if not fetched
+  // or plug into the current fetch if in progress
+  Backbone.Model.prototype.whenFetched = Backbone.Collection.whenFetched = function(success, error) {
+    if (this.hasBeenFetched) {
+      return success(this);
+    }
+    // find current fetch call (if any)
+    var _fetch = _.find(this[xhrLoadingAttribute], function(req) {
+      return req.method === 'read';
+    });
+    if (_fetch) {
+      _fetch.on('success', success);
+      if (error) {
+        _fetch.on('error', error);
+      }
+    } else {
+      this.fetch({ success: success, error: error });
+    }
+  }
+
   // forward all or some XHR events from the source object to the dest object
   Backbone.forwardXhrEvents = function (source, dest, typeOrCallback) {
     var handler = handleForwardedEvents(!_.isFunction(typeOrCallback) && typeOrCallback);

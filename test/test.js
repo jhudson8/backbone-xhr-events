@@ -1,4 +1,4 @@
-/*global it, describe, beforeEach, afterEach */
+/*global it.skip, describe, beforeEach, afterEach */
 
 var chai = require('chai'),
   sinon = require('sinon'),
@@ -40,6 +40,52 @@ describe("backbone-xhr-events", function () {
   });
   afterEach(function () {
     $.options = [];
+  });
+
+  describe("whenFetched", function () {
+    it("should return callback directly if already fetched", function () {
+      var spy = sinon.spy();
+      model.fetch();
+      $.success({});
+      model.whenFetched(spy);
+      expect(spy).to.have.been.calledWith(model);
+    });
+    it("should initiate a fetch if not already fetched", function () {
+      var spy = sinon.spy(),
+          onFetch = sinon.spy();
+      model.on('xhr:read', onFetch)
+      model.whenFetched(spy);
+      expect(onFetch).to.have.been.called;
+      $.success({});
+      expect(spy).to.have.been.calledWith(model);
+    });
+    it("should initiate a fetch and call error handler when applicable", function () {
+      var successSpy = sinon.spy(),
+          errorSpy = sinon.spy();
+      model.whenFetched(successSpy, errorSpy);
+      $.error({});
+      expect(errorSpy).to.have.been.called;
+      expect(successSpy).to.not.have.been.called;
+    });
+    it("should connect to an ongoing fetch and not initiate a new one", function () {
+      var spy = sinon.spy(),
+          onFetch = sinon.spy();
+      model.fetch();
+      model.on('xhr:read', onFetch)
+      model.whenFetched(spy);
+      expect(onFetch).to.not.have.been.called;
+      $.success({});
+      expect(spy).to.have.been.calledWith(model);
+    });
+    it("should connect to an ongoing fetch and fire error callback when applicable", function () {
+      var successSpy = sinon.spy(),
+          errorSpy = sinon.spy();
+      model.fetch();
+      model.whenFetched(successSpy, errorSpy);
+      $.error({});
+      expect(errorSpy).to.have.been.called;
+      expect(successSpy).to.not.have.been.called;
+    });
   });
 
   describe("standard model usage", function () {
@@ -195,7 +241,7 @@ describe("backbone-xhr-events", function () {
       $.success();
       expect(spy.callCount).to.eql(1);
 
-      // it should not trigger on complete if there are other concurrent loads
+      // it.skip should not trigger on complete if there are other concurrent loads
       model.fetch();
       model.fetch();
       expect(spy.callCount).to.eql(1);
