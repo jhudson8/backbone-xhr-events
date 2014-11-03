@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.6.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.6.1...master)
+
+## v0.6.1 - November 2nd, 2014
+- add whenFetched method - 7c4d1ba
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.6.0...v0.6.1)
 
 ## v0.6.0 - November 1st, 2014
 - rename to backbone-xhr-events - 5b7d4be
