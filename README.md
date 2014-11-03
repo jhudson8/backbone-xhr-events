@@ -237,9 +237,10 @@ Initiate a fetch if not already fetching or fetched.  Once the model/collection 
 myModel.whenFetched(function(model) {
     // executed when model is fetched (model and myModel are the same)
   },
-  function() {
+  function(model) {
     // executed if the model fetch fails
-  });
+  }
+);
 ```
 
 
