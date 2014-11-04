@@ -157,15 +157,19 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
 ```
 
 ### Request Context
+Every event has a "context" parameter.  This object is an event emitter as well as an object used for request scoped attributes.
+
+#### Context Lifecycle Events
 All XHR events provide a ```context``` as a parameter.  This is an object extending Backbone.Events and is used to bind to the XHR lifecycle events including
 
+* ***before-send***: after Backbone.sync has been executed and an XHR object has been created (but before execution), set context.preventDefault to stop processing.  Unlike other events, the signature here is (xhr, settings, context) where settings is the actual jquery settings object sent by Backbone.sync.
+* ***data***: before the model has handled the response
 * ***success***: when the XHR has completed sucessfully
 * ***error***: when the XHR has failed
 * ***complete***: when the XHR has either failed or succeeded
-* ***data***: before the model has handled the response
-* ***before-send***: after Backbone.sync has been executed and an XHR has been created (but before execution), set context.preventDefault to stop processing.  Unlike other events, the signature here is (xhr, settings, context) where settings is the actual jquery settings object sent by Backbone.sync.
 
-In addition, the following read only attributes are applicable
+#### Context Attributes
+The following read-only context attributes are applicable
 
 * ***options***: the Backbone.ajax options
 * ***settings***: available on "before-send" event; the jquery settings object provided by Backbone.sync
@@ -175,7 +179,7 @@ In addition, the following read only attributes are applicable
 
 These attributes can be set on the context to alter lifecycle behavior
 
-* ***preventDefault***: set this value as true at any stage to prevent further processing.  If you do not call context.options callbacks manually they will not be called at all.
+* ***preventDefault***: set this value as true at any stage to prevent further processing.  In this case, you must context.options callbacks manually or they will not be called at all.
 * ***response***: set this value within the "data" event handler to override the standard response content
 
 ### Overrides
