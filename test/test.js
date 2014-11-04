@@ -9,6 +9,7 @@ var chai = require('chai'),
   $ = {
     options: [],
     ajax: function (options) {
+      options.abort = sinon.spy();
       var doContinue = options.beforeSend('xhr', options);
       if (doContinue === false) {
         return;
@@ -17,7 +18,10 @@ var chai = require('chai'),
     },
     success: function () {
       if (this.options.length) {
-        this.options.splice(0, 1)[0].success.apply(this, arguments);
+        var _options = this.options.splice(0, 1)[0];
+        if (_options.abort.callCount == 0) {
+          _options.success.apply(this, arguments)
+        }
       } else {
         throw new Error('no available options');
       }
@@ -57,18 +61,13 @@ describe("backbone-xhr-events", function () {
           var options = context.options;
           // see if any current XHR activity matches this request
           var match = _.find(model.xhrActivity, function(_context) {
-            return context !== _context
-                && options.url === _context.options.url
+            return options.url === _context.options.url
                 && method === _context.method
                 && _.isEqual(settings.data, _context.settings.data);
           });
           if (match) {
-            match.on('data', function(data, status, xhr) {
-              context.options.success({foo: "bar"}, status, xhr);
-            });
-            match.on('error', function(xhr, type, error) {
-              context.options.error(data, status, xhr);
-            });
+            match.on('after-send', context.options.success);
+            match.on('error', context.options.error);
             context.preventDefault = true;
           }
         });
@@ -326,7 +325,7 @@ describe("backbone-xhr-events", function () {
       expect(model.xhrActivity).to.eql(undefined);
     });
 
-    it("triggers 'data' before 'success'", function () {
+    it("triggers 'after-send' before 'success'", function () {
       var count = 0,
         origResponseData,
         successId,
@@ -334,16 +333,16 @@ describe("backbone-xhr-events", function () {
         successSpy = function () {
           successId = count++;
         },
-        dataSpy = function (data, status, xhr, context) {
+        afterSendSpy = function (data, status, xhr, context) {
           dataId = count++;
           origResponseData = data;
-          context.response = {
+          context.data = {
             abc: "def"
           };
         },
         eventSpy = sinon.spy(function (type, events) {
           events.on('success', successSpy);
-          events.on('data', dataSpy);
+          events.on('after-send', afterSendSpy);
         });
 
       model.on('xhr', eventSpy);
@@ -396,6 +395,18 @@ describe("backbone-xhr-events", function () {
       expect(args[1]).to.eql(model);
       expect(!!args[2].trigger).to.eql(true);
       expect(args[2].options.foo).to.eql('bar');
+    });
+  });
+
+  describe("Context methods", function () {
+    describe("abort", function() {
+      it ('should preventDefault on before-send') {
+        model.on('xhr', function(context) {
+          context.abort();
+        });
+        expect($.options.length).to.eql(0);
+      }
+
     });
   });
 

@@ -51,6 +51,13 @@
   var SUCCESS = 'success';
   var ERROR = 'error';
 
+  var Context = function(method, model, options) {
+    this.method = method;
+    this.model = model;
+    this.options = options;
+  }
+  _.extend(Context.prototype, Backbone.Events);
+
   // allow backbone to send xhr events on models
   var _sync = Backbone.sync;
   Backbone.sync = function (method, model, options) {
@@ -61,7 +68,7 @@
       options.url = _.result(model, 'url');
     }
 
-    var context = initializeXHRLoading(model, model, options, method);
+    var context = initializeXHRLoading(method, model, model, options);
     if (context.preventDefault) {
       // it is assumed that either context.options.success or context.options.error will be called
       return;
@@ -144,7 +151,7 @@
           eventName = type;
         }
         // these events will be called because we are using the same options object as the source call
-        initializeXHRLoading(this, events.model, events.options, events.method);
+        initializeXHRLoading(events.method, this, events.model, events.options);
       }
       _eventForwarders[type] = func;
     }
@@ -155,15 +162,10 @@
   // "model" is to trigger events on and "sourceModel" is the model to provide to the success/error callbacks
   // these are the same unless there is event forwarding in which case the "sourceModel" is the model that actually
   // triggered the events and "model" is just forwarding those events
-  function initializeXHRLoading(model, sourceModel, options, method) {
+  function initializeXHRLoading(method, model, sourceModel, options) {
     var loads = model[xhrLoadingAttribute] = model[xhrLoadingAttribute] || [],
       eventName = options && options.event || method,
-      context = _.extend({}, Backbone.Events);
-
-    context.method = method;
-    context.options = options;
-    context.model = sourceModel;
-    loads.push(context);
+      context = new Context(method, sourceModel, options);
 
     var scopedEventName = xhrEventName + ':' + eventName;
     model.trigger(xhrEventName, eventName, context);
@@ -190,6 +192,7 @@
       if (context.preventDefault) {
         return false;
       }
+      loads.push(context);
     };
 
 
@@ -199,8 +202,8 @@
       options[type] = function (p1, p2, p3) {
         if (type === SUCCESS && !context.preventDefault) {
           // trigger the "data" event which allows manipulation of the response before any other events or callbacks are fired
-          context.trigger('data', p1, p2, p3, context);
-          p1 = context.response || p1;
+          context.trigger('after-send', p1, p2, p3, context);
+          p1 = context.data || p1;
           // if context.preventDefault is true, it is assumed that the option success or callback will be manually called
           if (context.preventDefault) {
             return;

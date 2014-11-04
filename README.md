@@ -2,7 +2,7 @@ backbone-xhr-events
 ====================
 Do more than what the default [Backbone](http://http://backbonejs.org/) Model/Collection ```request``` event does for you.  The primary benefits are
 
-* Use events to bind to ```success```/```error```/```complete``` events for each request (and an additional ```data``` event)
+* Provide robust lifecycle events (```before-send```, ```after-send```, ```success```, ```error```, ```complete```)
 * Emit type specific XHR events to allow for focused binding
 * Give ability to see if a model currently has any pending XHR activity
 * Provide a global event bus to bind to all Model/Collection XHR activity
@@ -48,7 +48,7 @@ model.on('xhr:read', function(context) {
 Override the XHR payload or cache it
 ```
 model.on('xhr', function(method, context) {
-  context.on('data', function(data, status, xhr, context) {
+  context.on('after-send', function(data, status, xhr, context) {
     // wrap the response as a "response" attribute
     context.response = { response: data };
     // cache the response
@@ -76,7 +76,7 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
 Make a successful XHR look like a failure
 ```
 model.on('xhr', function(method, context) {
-  context.on('data', function(data, status, xhr, context) {
+  context.on('after-send', function(data, status, xhr, context) {
     if (!context.preventDefault) {
       // we don't want to call success/error callback more than once
       context.preventDefault = true;
@@ -140,14 +140,13 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
 
     // see if any current XHR activity matches this request
     var match = _.find(model.xhrActivity, function(_context) {
-      return context !== _context // make sure the match isn't the current request
-          && context.options.url === _context.options.url
+      return context.options.url === _context.options.url
           && method === _context.method
           && _.isEqual(settings.data, _context.settings.data);
     });
     if (match) {
       // when the pending request comes back, simulate the same activity on this request
-      match.on('data', context.options.success);
+      match.on('after-send', context.options.success);
       match.on('error', context.options.error);
       context.preventDefault = true;
     }
@@ -162,7 +161,7 @@ Every event has a "context" parameter.  This object is an event emitter as well 
 All XHR events provide a ```context``` as a parameter.  This is an object extending Backbone.Events and is used to bind to the XHR lifecycle events including
 
 * ***before-send***: after Backbone.sync has been executed and an XHR object has been created (but before execution), set context.preventDefault to stop processing.  Unlike other events, the signature here is (xhr, settings, context) where settings is the actual jquery settings object sent by Backbone.sync.
-* ***data***: (data, status, xhr, context) before the model has handled the response
+* ***after-send***: (data, status, xhr, context) before the model has handled the response
 * ***success***: (context) when the XHR has completed sucessfully
 * ***error***: (xhr, type, error, context) when the XHR has failed
 * ***complete***: ('success|error', {success or error specific params}) when the XHR has either failed or succeeded
@@ -179,7 +178,10 @@ The following read-only context attributes are applicable
 These attributes can be set on the context to alter lifecycle behavior
 
 * ***preventDefault***: set this value as true at any stage to prevent further processing.  In this case, you must context.options callbacks manually or they will not be called at all.
-* ***response***: set this value within the "data" event handler to override the standard response content
+* ***data***: set this value within an "after-send" event handler to override the standard response data
+
+#### Context methods
+* ***abort***: if after "before-send" lifecycle this will call ```abort``` on the source ```XMLHttpRequest```
 
 ### Overrides
 Almost all event names and model/global attributes can be overridden to suit your needs.
