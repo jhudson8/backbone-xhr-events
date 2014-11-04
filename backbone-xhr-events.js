@@ -85,6 +85,10 @@
   // initiate a fetch with this callback as the success option if not fetched
   // or plug into the current fetch if in progress
   Backbone.Model.prototype.whenFetched = Backbone.Collection.whenFetched = function(success, error) {
+    var model = this;
+    function successWrapper() {
+      success(model);
+    }
     if (this.hasBeenFetched) {
       return success(this);
     }
@@ -93,12 +97,12 @@
       return req.method === 'read';
     });
     if (_fetch) {
-      _fetch.on('success', success);
+      _fetch.on('success', successWrapper);
       if (error) {
         _fetch.on('error', error);
       }
     } else {
-      this.fetch({ success: success, error: error });
+      this.fetch({ success: successWrapper, error: error });
     }
   }
 
@@ -222,7 +226,7 @@
         }
 
         // trigger the success/error event
-        var args = (type === SUCCESS) ? [type, sourceModel, context] : [type, sourceModel, p1, p2, p3, context];
+        var args = (type === SUCCESS) ? [type, context] : [type, p1, p2, p3, context];
         context.trigger.apply(context, args);
 
         // trigger the complete event

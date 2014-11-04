@@ -279,13 +279,11 @@ describe("backbone-xhr-events", function () {
       model.fetch(options);
       $.success({});
       expect(success.callCount).to.eql(1);
-      expect(success.getCall(0).args[0]).to.eql(model);
-      expect(success.getCall(0).args[1].options.foo).to.eql('bar');
+      expect(success.getCall(0).args[0].options.foo).to.eql('bar');
       expect(error.callCount).to.eql(0);
       expect(complete.callCount).to.eql(1);
       expect(complete.getCall(0).args[0]).to.eql('success');
-      expect(complete.getCall(0).args[1]).to.eql(model);
-      expect(complete.getCall(0).args[2].options.foo).to.eql('bar');
+      expect(complete.getCall(0).args[1].options.foo).to.eql('bar');
     });
 
     it("provide correct error event parameters", function () {
@@ -303,19 +301,17 @@ describe("backbone-xhr-events", function () {
       });
       $.error('xhr', 'errorType', 'thrownError');
       expect(error.callCount).to.eql(1);
-      expect(error.getCall(0).args[0]).to.eql(model);
-      expect(error.getCall(0).args[1]).to.eql('xhr');
-      expect(error.getCall(0).args[2]).to.eql('errorType');
-      expect(error.getCall(0).args[3]).to.eql('thrownError');
-      expect(error.getCall(0).args[4].options.foo).to.eql('bar');
+      expect(error.getCall(0).args[0]).to.eql('xhr');
+      expect(error.getCall(0).args[1]).to.eql('errorType');
+      expect(error.getCall(0).args[2]).to.eql('thrownError');
+      expect(error.getCall(0).args[3].options.foo).to.eql('bar');
       expect(success.callCount).to.eql(0);
       expect(complete.callCount).to.eql(1);
       expect(complete.getCall(0).args[0]).to.eql('error');
-      expect(complete.getCall(0).args[1]).to.eql(model);
-      expect(complete.getCall(0).args[2]).to.eql('xhr');
-      expect(complete.getCall(0).args[3]).to.eql('errorType');
-      expect(complete.getCall(0).args[4]).to.eql('thrownError');
-      expect(complete.getCall(0).args[5].options.foo).to.eql('bar');
+      expect(complete.getCall(0).args[1]).to.eql('xhr');
+      expect(complete.getCall(0).args[2]).to.eql('errorType');
+      expect(complete.getCall(0).args[3]).to.eql('thrownError');
+      expect(complete.getCall(0).args[4].options.foo).to.eql('bar');
     });
 
     it("use loading to return true if there is any current xhr activity", function () {
@@ -406,8 +402,8 @@ describe("backbone-xhr-events", function () {
   describe("XHR forwarding", function () {
     it('should forward events and handle fetch success conditions appropriately', function () {
       var successModel,
-        successSpy = sinon.spy(function (model) {
-          successModel = model;
+        successSpy = sinon.spy(function (context) {
+          successModel = context.model;
         }),
         eventSpy = sinon.spy(function (events) {
           events.on('success', successSpy);

@@ -29,10 +29,10 @@ model.on('xhr', function(method, context) {
     // type will either be "success" or "error" and the type specific args are the same as what is provided to the respective events
     // this will be called when the XHR succeeds or fails
   });
-  context.on('success', function(model) {
+  context.on('success', function(context) {
     // this will be called after the XHR succeeds
   });
-  context.on('error', function(model, xhr, type, error) {
+  context.on('error', function(xhr, type, error, context) {
     // this will be called if the XHR fails
   });
 });
@@ -144,11 +144,12 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
           && _.isEqual(settings.data, _context.settings.data);
     });
     if (match) {
+      // when the pending request comes back, simulate the same activity on this request
       match.on('data', function(data, status, xhr) {
-        context.options.success({foo: "bar"}, status, xhr);
+        context.options.success(data, status, xhr);
       });
       match.on('error', function(xhr, type, error) {
-        context.options.error(data, status, xhr);
+        context.options.error(xhr, type, error);
       });
       context.preventDefault = true;
     }
@@ -163,10 +164,10 @@ Every event has a "context" parameter.  This object is an event emitter as well 
 All XHR events provide a ```context``` as a parameter.  This is an object extending Backbone.Events and is used to bind to the XHR lifecycle events including
 
 * ***before-send***: after Backbone.sync has been executed and an XHR object has been created (but before execution), set context.preventDefault to stop processing.  Unlike other events, the signature here is (xhr, settings, context) where settings is the actual jquery settings object sent by Backbone.sync.
-* ***data***: before the model has handled the response
-* ***success***: when the XHR has completed sucessfully
-* ***error***: when the XHR has failed
-* ***complete***: when the XHR has either failed or succeeded
+* ***data***: (data, status, xhr, context) before the model has handled the response
+* ***success***: (context) when the XHR has completed sucessfully
+* ***error***: (xhr, type, error, context) when the XHR has failed
+* ***complete***: ('success|error', {success or error specific params}) when the XHR has either failed or succeeded
 
 #### Context Attributes
 The following read-only context attributes are applicable
