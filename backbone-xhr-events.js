@@ -82,7 +82,9 @@
       // it is assumed that either context.options.success or context.options.error will be called
       return;
     }
-    return _sync.call(this, method, model, options);
+    var xhr = _sync.call(this, method, model, options);
+    context.xhr = xhr;
+    return xhr;
   };
 
   // provide helper flags to determine model fetched status

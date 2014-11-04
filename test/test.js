@@ -1,4 +1,4 @@
-/*global it.skip, describe, beforeEach, afterEach */
+/*global it, describe, beforeEach, afterEach */
 
 var chai = require('chai'),
   sinon = require('sinon'),
@@ -9,17 +9,21 @@ var chai = require('chai'),
   $ = {
     options: [],
     ajax: function (options) {
-      options.abort = sinon.spy();
+      var xhr = {
+        abort: sinon.spy()
+      };
+      options.xhr = xhr;
       var doContinue = options.beforeSend('xhr', options);
       if (doContinue === false) {
         return;
       }
       this.options.push(options);
+      return xhr;
     },
     success: function () {
       if (this.options.length) {
         var _options = this.options.splice(0, 1)[0];
-        if (_options.abort.callCount == 0) {
+        if (_options.xhr.abort.callCount == 0) {
           _options.success.apply(this, arguments)
         }
       } else {
@@ -41,14 +45,17 @@ describe("backbone-xhr-events", function () {
   var XhrModel = Backbone.Model.extend({
       url: 'foo'
     }),
+    clock,
     model,
     event;
 
   beforeEach(function () {
     model = new XhrModel();
+    clock = sinon.useFakeTimers();
   });
   afterEach(function () {
     $.options = [];
+    clock.restore();
   });
 
 
@@ -400,13 +407,31 @@ describe("backbone-xhr-events", function () {
 
   describe("Context methods", function () {
     describe("abort", function() {
-      it ('should preventDefault on before-send') {
-        model.on('xhr', function(context) {
+      it('should preventDefault on initial xhr event', function() {
+        model.on('xhr:read', function(context) {
           context.abort();
         });
         expect($.options.length).to.eql(0);
-      }
-
+      });
+      it('should preventDefault on before-send', function() {
+        model.on('xhr:read', function(context) {
+          context.on('before-send', function() {
+            context.abort();
+          });
+        });
+        expect($.options.length).to.eql(0);
+      });
+      it('should xhr abort on initial xhr event next tick', function() {
+        model.on('xhr:read', function(context) {
+          _.defer(function() {
+            context.abort();
+          });
+        });
+        model.fetch();
+        clock.tick(1);
+        expect($.options.length).to.eql(1);
+        expect($.options[0].xhr.abort.callCount).to.eql(1);
+      });
     });
   });
 
