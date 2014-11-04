@@ -171,6 +171,25 @@
       globalXhrBus.trigger(scopedEventName, model, context);
     }
 
+    // allow for 1 last override
+    var _beforeSend = options.beforeSend;
+    options.beforeSend = function(xhr, settings) {
+      context.xhr = xhr;
+      context.settings = settings;
+
+      if (_beforeSend) {
+        var rtn = _beforeSend.call(this, xhr, settings);
+        if (rtn === false) {
+          return rtn;
+        }
+      }
+      context.trigger('before-send', xhr, settings, context);
+      if (context.preventDefault) {
+        return false;
+      }
+    };
+
+
     function onComplete(type) {
       var _type = options[type];
       // success: (data, status, xhr);  error: (xhr, type, error)
