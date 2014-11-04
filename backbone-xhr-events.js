@@ -56,6 +56,15 @@
     this.model = model;
     this.options = options;
   }
+  Context.prototype.abort = function() {
+    if (!this.aborted) {
+      this.aborted = true;
+      this.preventDefault = true;
+      if (this.xhr) {
+        this.xhr.abort();
+      }
+    }
+  }
   _.extend(Context.prototype, Backbone.Events);
 
   // allow backbone to send xhr events on models
