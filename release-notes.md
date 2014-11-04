@@ -2,7 +2,15 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.7.1...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.0...master)
+
+## v0.8.0 - November 4th, 2014
+- add abort context method - bcd77bd
+- add "abort" context method - 0d95e6a
+- change "data" event to "after-send" and "request" context attribute to "data" - 5cb80b5
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.7.1...v0.8.0)
 
 ## v0.7.1 - November 4th, 2014
 - remove model from context lifecycle event params - 782050c
