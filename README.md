@@ -136,6 +136,8 @@ Prevent duplicate concurrent submission of any XHR request
 ```
 Backbone.xhrEvents.on('xhr', function(method, model, context) {
   context.on('before-send', function(xhr, settings) {
+    // we need to use before-send because Backbone.sync creates settings.data
+
     // see if any current XHR activity matches this request
     var match = _.find(model.xhrActivity, function(_context) {
       return context !== _context // make sure the match isn't the current request
@@ -145,12 +147,8 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
     });
     if (match) {
       // when the pending request comes back, simulate the same activity on this request
-      match.on('data', function(data, status, xhr) {
-        context.options.success(data, status, xhr);
-      });
-      match.on('error', function(xhr, type, error) {
-        context.options.error(xhr, type, error);
-      });
+      match.on('data', context.options.success);
+      match.on('error', context.options.error);
       context.preventDefault = true;
     }
   });
