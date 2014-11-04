@@ -9,12 +9,17 @@ var chai = require('chai'),
   $ = {
     options: [],
     ajax: function (options) {
+      var doContinue = options.beforeSend('xhr', options);
+      if (doContinue === false) {
+        return;
+      }
       this.options.push(options);
     },
     success: function () {
-      var options = this.options.pop();
-      if (options.success) {
-        options.success.apply(options, arguments);
+      if (this.options.length) {
+        this.options.splice(0, 1)[0].success.apply(this, arguments);
+      } else {
+        throw new Error('no available options');
       }
     },
     error: function () {
@@ -41,6 +46,128 @@ describe("backbone-xhr-events", function () {
   afterEach(function () {
     $.options = [];
   });
+
+
+
+  describe("examples", function () {
+    describe('Prevent duplicate concurrent submission of any XHR request', function() {
+
+      function onXhr(method, model, context) {
+        context.on('before-send', function(xhr, settings) {
+          var options = context.options;
+          // see if any current XHR activity matches this request
+          var match = _.find(model.xhrActivity, function(_context) {
+            return context !== _context
+                && options.url === _context.options.url
+                && method === _context.method
+                && _.isEqual(settings.data, _context.settings.data);
+          });
+          if (match) {
+            match.on('data', function(data, status, xhr) {
+              context.options.success({foo: "bar"}, status, xhr);
+            });
+            match.on('error', function(xhr, type, error) {
+              context.options.error(data, status, xhr);
+            });
+            context.preventDefault = true;
+          }
+        });
+      }
+
+      beforeEach(function() {
+        sinon.spy($, 'ajax');
+        sinon.spy(Backbone.Model.prototype, 'parse');
+        model.url = function() {
+          return 'foo/' + this.attributes.a;
+        }
+        Backbone.xhrEvents.on('xhr', onXhr);
+      });
+      afterEach(function() {
+        $.ajax.restore();
+        Backbone.Model.prototype.parse.restore();
+        Backbone.xhrEvents.off('xhr', onXhr);
+      });
+
+      it('should bypass the 2nd request and allow the model to parse correctly', function() {
+        var spy1 = sinon.spy(),
+            spy2 = sinon.spy();
+        model.fetch({success: spy1});
+        expect($.options.length).to.eql(1);
+        model.fetch({success: spy2});
+        expect($.options.length).to.eql(1);
+
+        $.success({foo: 'bar'});
+        expect($.options.length).to.eql(0);
+        expect(model.parse.callCount).to.eql(2);
+        expect(spy1.callCount).to.eql(1);
+        expect(spy2.callCount).to.eql(1);
+        expect(model.attributes.foo).to.eql('bar');
+      });
+
+      it('should not bypass the 2nd fetch if url is different', function() {
+        var spy1 = sinon.spy(),
+            spy2 = sinon.spy();
+        model.fetch({success: spy1});
+        expect($.ajax.callCount).to.eql(1);
+        model.set({a: 'b'});
+        model.fetch({success: spy2});
+        expect($.ajax.callCount).to.eql(2);
+
+        $.success({r: 1});
+        expect(model.parse.callCount).to.eql(1);
+        expect($.options.length).to.eql(1);
+        expect(model.attributes.r).to.eql(1);
+
+        $.success({r: 2});
+        expect(model.parse.callCount).to.eql(2);
+        expect($.options.length).to.eql(0);
+        expect(model.attributes.r).to.eql(2);
+      });
+
+      it('should not execute a 2nd destroy call with the same data', function() {
+        var spy1 = sinon.spy(),
+            spy2 = sinon.spy(),
+            destroySpy = sinon.spy();
+
+        model.set({id: 1});
+        model.on('destroy', destroySpy);
+        model.destroy({success: spy1});
+
+        expect($.options.length).to.eql(1);
+        model.destroy({success: spy2});
+        expect($.options.length).to.eql(1);
+        $.success({});
+        expect(destroySpy.callCount).to.eql(2);
+        expect(spy1.callCount).to.eql(1);
+        expect(spy2.callCount).to.eql(1);
+
+      });
+
+      it('should not execute a 2nd destroy call with the same data', function() {
+        var spy1 = sinon.spy(),
+            spy2 = sinon.spy(),
+            spy3 = sinon.spy();
+
+        model.set({id: 1});
+        model.save({c: 'd'}, {success: spy1});
+        expect($.options.length).to.eql(1);
+        model.save({c: 'd'}, {success: spy2});
+        expect($.options.length).to.eql(1);
+        model.save({e: 'f'}, {success: spy3});
+        expect($.options.length).to.eql(2);
+        $.success({});
+        expect(spy1.callCount).to.eql(1);
+        expect(spy2.callCount).to.eql(1);
+        expect(spy3.callCount).to.eql(0);
+        $.success({});
+        expect(spy3.callCount).to.eql(1);
+      });
+
+    });
+
+  });
+
+
 
   describe("whenFetched", function () {
     it("should return callback directly if already fetched", function () {

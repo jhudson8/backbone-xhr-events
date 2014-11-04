@@ -66,9 +66,8 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
   if (context.method === 'read') {
     var cachedResult = _getFetchCache(url);
     if (cachedResult) {
-      context.intercept = function(options) {
-        options.success(JSON.parse(cachedResult), 'success');
-      }  
+      context.preventDefault = true;
+      options.success(JSON.parse(cachedResult), 'success');
     }
   }
 });
@@ -133,6 +132,30 @@ Backbone.forwardXhrEvents(sourceModel, receiverModel, function() {
 });
 ```
 
+Prevent duplicate concurrent submission of any XHR request
+```
+Backbone.xhrEvents.on('xhr', function(method, model, context) {
+  context.on('before-send', function(xhr, settings) {
+    // see if any current XHR activity matches this request
+    var match = _.find(model.xhrActivity, function(_context) {
+      return context !== _context // make sure the match isn't the current request
+          && context.options.url === _context.options.url
+          && method === _context.method
+          && _.isEqual(settings.data, _context.settings.data);
+    });
+    if (match) {
+      match.on('data', function(data, status, xhr) {
+        context.options.success({foo: "bar"}, status, xhr);
+      });
+      match.on('error', function(xhr, type, error) {
+        context.options.error(data, status, xhr);
+      });
+      context.preventDefault = true;
+    }
+  });
+});
+```
+
 ### Request Context
 All XHR events provide a ```context``` as a parameter.  This is an object extending Backbone.Events and is used to bind to the XHR lifecycle events including
 
@@ -140,18 +163,20 @@ All XHR events provide a ```context``` as a parameter.  This is an object extend
 * ***error***: when the XHR has failed
 * ***complete***: when the XHR has either failed or succeeded
 * ***data***: before the model has handled the response
+* ***before-send***: after Backbone.sync has been executed and an XHR has been created (but before execution), set context.preventDefault to stop processing.  Unlike other events, the signature here is (xhr, settings, context) where settings is the actual jquery settings object sent by Backbone.sync.
 
 In addition, the following read only attributes are applicable
 
 * ***options***: the Backbone.ajax options
+* ***settings***: available on "before-send" event; the jquery settings object provided by Backbone.sync
 * ***xhr***: the actual XMLHttpRequest
 * ***method***: the Backbone.sync method
 * ***model***: the associated model
 
 These attributes can be set on the context to alter lifecycle behavior
 
-* ***intercept***: set this value with a callback function(options) which will prevent further execution and execute the callback
-* ***preventDefault***: set this value as true when binding to the 'data' event if you want to alter success/error behavior (you must call options.success or options.error manually)
+* ***preventDefault***: set this value as true at any stage to prevent further processing.  If you do not call context.options callbacks manually they will not be called at all.
+* ***response***: set this value within the "data" event handler to override the standard response content
 
 ### Overrides
 Almost all event names and model/global attributes can be overridden to suit your needs.
