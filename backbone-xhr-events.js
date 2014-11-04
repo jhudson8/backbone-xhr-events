@@ -175,11 +175,11 @@
       var _type = options[type];
       // success: (data, status, xhr);  error: (xhr, type, error)
       options[type] = function (p1, p2, p3) {
-        if (type === SUCCESS && !context.stop) {
+        if (type === SUCCESS && !context.preventDefault) {
           // trigger the "data" event which allows manipulation of the response before any other events or callbacks are fired
           context.trigger('data', p1, p2, p3, context);
           p1 = context.response || p1;
-          // if lifecycleEvents.stop is set, it is assumed that the option success or callback will be manually called
+          // if context.preventDefault is true, it is assumed that the option success or callback will be manually called
           if (context.preventDefault) {
             return;
           }
