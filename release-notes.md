@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.7.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.7.1...master)
+
+## v0.7.1 - November 4th, 2014
+- remove model from context lifecycle event params - 782050c
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.7.0...v0.7.1)
 
 ## v0.7.0 - November 4th, 2014
 - add "before-send" context event - f446504
