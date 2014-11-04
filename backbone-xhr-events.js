@@ -62,16 +62,9 @@
     }
 
     var context = initializeXHRLoading(model, model, options, method);
-
-    // options.intercept can be used to override the standard response
-    // it is assumed that either options.success or options.error will be called
-    var intercept = context.intercept;
-    if (intercept) {
-      if (_.isFunction(intercept)) {
-        return intercept(options);
-      } else {
-        throw new Error("intercept must be function(options)");
-      }
+    if (context.preventDefault) {
+      // it is assumed that either context.options.success or context.options.error will be called
+      return;
     }
     context.xhr = _sync.call(this, method, model, options);
     return context.xhr;
