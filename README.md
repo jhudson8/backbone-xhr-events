@@ -21,19 +21,36 @@ Sections
 ### General Usage Examples
 Bind to a model to listen to all XHR activity
 ```
+// method is "read", "save", or "delete" or custom (Backbone.sync method)
+// context is a Backbone.Events to bind to XHR lifecycle events
 model.on('xhr', function(method, context) {
-  // method is "read", "save", or "delete" or custom (Backbone.sync method)
-  // context is a Backbone.Events to bind to XHR lifecycle events
+  // 'xhr' event is sent before core Backbone.sync is executed
+
+  // xhr = the XMLHttpRequest; settings
+  context.on('before-send', function(xhr, settings, context) {
+    // after core Backbone.sync has executed $.ajax and an XMLHttpRequest has been created
+    // but before the XHR has been executed = $.ajax settings
+  });
+
+  context.on('after-send', function(data, status, xhr, context) {
+    // after the XHR has returned but before Backbone.sync has handled the response
+  });
+
+  context.on('success', function(context) {
+    // this will be called after the XHR succeeds
+  });
+
+  context.on('success', function(context) {
+    // this will be called after the XHR succeeds
+  });
+
+  context.on('error', function(xhr, type, error, context) {
+    // this will be called if the XHR fails
+  });
 
   context.on('complete', function(type, {type specific args}) {
     // type will either be "success" or "error" and the type specific args are the same as what is provided to the respective events
     // this will be called when the XHR succeeds or fails
-  });
-  context.on('success', function(context) {
-    // this will be called after the XHR succeeds
-  });
-  context.on('error', function(xhr, type, error, context) {
-    // this will be called if the XHR fails
   });
 });
 ```
