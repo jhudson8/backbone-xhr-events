@@ -60,13 +60,13 @@ model.on('xhr:read', function(context) {
 
 Override the XHR payload or cache it
 ```
-model.on('xhr', function(method, context) {
+Backbone.xhrEvents.on('xhr', function(method, model, context) {
   context.on('after-send', function(data, status, xhr, context) {
     // wrap the response as a "response" attribute
-    context.response = { response: data };
+    context.data = { response: data };
     // cache the response
     if (method === 'read') {
-      _cacheFetchResponse(JSON.stringify(data));
+      _cacheFetchResponse(JSON.stringify(data), context.options.url);
     }
   });
 });
@@ -75,9 +75,8 @@ model.on('xhr', function(method, context) {
 Intercept a request and return a cached payload
 ```
 Backbone.xhrEvents.on('xhr', function(method, model, context) {
-  var url = context.options.url;
   if (context.method === 'read') {
-    var cachedResult = _getFetchCache(url);
+    var cachedResult = _getFetchCache(context.options.url);
     if (cachedResult) {
       context.preventDefault = true;
       options.success(JSON.parse(cachedResult), 'success');
