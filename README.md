@@ -40,10 +40,6 @@ model.on('xhr', function(method, context) {
     // this will be called after the XHR succeeds
   });
 
-  context.on('success', function(context) {
-    // this will be called after the XHR succeeds
-  });
-
   context.on('error', function(xhr, type, error, context) {
     // this will be called if the XHR fails
   });
