@@ -26,7 +26,7 @@ Bind to a model to listen to all XHR activity
 model.on('xhr', function(method, context) {
   // 'xhr' event is sent before core Backbone.sync is executed
 
-  // xhr = the XMLHttpRequest; settings
+  // xhr = the XMLHttpRequest; settings = $.ajax settings
   context.on('before-send', function(xhr, settings, context) {
     // after core Backbone.sync has executed $.ajax and an XMLHttpRequest has been created
     // but before the XHR has been executed = $.ajax settings
