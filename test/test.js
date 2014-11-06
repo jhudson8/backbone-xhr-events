@@ -340,7 +340,7 @@ describe("backbone-xhr-events", function () {
         successSpy = function () {
           successId = count++;
         },
-        afterSendSpy = function (data, status, xhr, context) {
+        afterSendSpy = function (data, status, xhr, responseType, context) {
           dataId = count++;
           origResponseData = data;
           context.data = {

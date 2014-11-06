@@ -32,8 +32,16 @@ model.on('xhr', function(method, context) {
     // but before the XHR has been executed = $.ajax settings
   });
 
-  context.on('after-send', function(data, status, xhr, context) {
+  context.on('after-send', function(p1, p2, p3, responseType {
     // after the XHR has returned but before Backbone.sync has handled the response
+
+    if (responseType === 'success') {
+      // additional params are (data, status, xhr, context);
+    }
+    if (responseType === 'error') {
+      // additional params are (xhr, type, error)
+    }
+
   });
 
   context.on('success', function(context) {
@@ -61,12 +69,14 @@ model.on('xhr:read', function(context) {
 Override the XHR payload or cache it
 ```
 Backbone.xhrEvents.on('xhr', function(method, model, context) {
-  context.on('after-send', function(data, status, xhr, context) {
-    // wrap the response as a "response" attribute
-    context.data = { response: data };
-    // cache the response
-    if (method === 'read') {
-      _cacheFetchResponse(JSON.stringify(data), context.options.url);
+  context.on('after-send', function(data, status, xhr, responseType, context) {
+    if (responseType === 'success') {
+      // wrap the response as a "response" attribute
+      context.data = { response: data };
+      // cache the response
+      if (method === 'read') {
+        _cacheFetchResponse(JSON.stringify(data), context.options.url);
+      }
     }
   });
 });
@@ -88,7 +98,7 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
 Make a successful XHR look like a failure
 ```
 model.on('xhr', function(method, context) {
-  context.on('after-send', function(data, status, xhr, context) {
+  context.on('after-send', function(data, status, xhr, responseType) {
     if (!context.preventDefault) {
       // we don't want to call success/error callback more than once
       context.preventDefault = true;
@@ -166,6 +176,17 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
 });
 ```
 
+Prevent the error callback if the request is aborted
+```
+Backbone.xhrEvents.on('xhr', function(method, model, context) {
+  context.on('after-send', function(xhr, errorType, error, responseType) {
+    if (errorType === 'abort') {
+      context.preventDefault = true;
+    }
+  });
+});
+```
+
 ### Request Context
 Every event has a "context" parameter.  This object is an event emitter as well as an object used for request scoped attributes.
 
@@ -173,7 +194,7 @@ Every event has a "context" parameter.  This object is an event emitter as well 
 All XHR events provide a ```context``` as a parameter.  This is an object extending Backbone.Events and is used to bind to the XHR lifecycle events including
 
 * ***before-send***: after Backbone.sync has been executed and an XHR object has been created (but before execution), set context.preventDefault to stop processing.  Unlike other events, the signature here is (xhr, settings, context) where settings is the actual jquery settings object sent by Backbone.sync.
-* ***after-send***: (data, status, xhr, context) before the model has handled the response
+* ***after-send***: ({jquery error or success callback params (data, status, xhr) or (xhr, type, error)}, responseType, context) before the model has handled the response
 * ***success***: (context) when the XHR has completed sucessfully
 * ***error***: (xhr, type, error, context) when the XHR has failed
 * ***complete***: ('success|error', {success or error specific params}) when the XHR has either failed or succeeded

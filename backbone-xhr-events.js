@@ -213,7 +213,7 @@
       options[type] = function (p1, p2, p3) {
         if (type === SUCCESS && !context.preventDefault) {
           // trigger the "data" event which allows manipulation of the response before any other events or callbacks are fired
-          context.trigger('after-send', p1, p2, p3, context);
+          context.trigger('after-send', p1, p2, p3, type, context);
           p1 = context.data || p1;
           // if context.preventDefault is true, it is assumed that the option success or callback will be manually called
           if (context.preventDefault) {
