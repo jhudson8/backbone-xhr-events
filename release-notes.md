@@ -2,7 +2,15 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.1...master)
+
+## v0.8.1 - November 6th, 2014
+- add responseType to 'after-send' event - f60acdf
+
+Compatibility notes:
+This should really be a minor release but I just performed a minor release and I don't believe anyone will be using this event yet
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.0...v0.8.1)
 
 ## v0.8.0 - November 4th, 2014
 - add abort context method - bcd77bd
