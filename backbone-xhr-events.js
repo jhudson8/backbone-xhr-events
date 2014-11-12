@@ -221,22 +221,25 @@
           }
         }
 
-        // options callback
         var _args = arguments;
-        if (_type) {
-          _type.call(this, p1, p2, p3);
+        // options callback
+        try {
+          if (_type) {
+            _type.call(this, p1, p2, p3);
+          }
         }
+        finally {
+          // remove the load entry
+          var index = loads.indexOf(context);
+          if (index >= 0) {
+            loads.splice(index, 1);
+          }
 
-        // remove the load entry
-        var index = loads.indexOf(context);
-        if (index >= 0) {
-          loads.splice(index, 1);
-        }
-
-        // if there are no more cuncurrent XHRs, model[xhrLoadingAttribute] should always be undefind
-        if (loads.length === 0) {
-          model[xhrLoadingAttribute] = undefined;
-          model.trigger(xhrCompleteEventName, context);
+          // if there are no more cuncurrent XHRs, model[xhrLoadingAttribute] should always be undefind
+          if (loads.length === 0) {
+            model[xhrLoadingAttribute] = undefined;
+            model.trigger(xhrCompleteEventName, context);
+          }
         }
 
         // trigger the success/error event
