@@ -1,5 +1,5 @@
 /*!
- * backbone-xhr-events v0.8.2
+ * backbone-xhr-events v0.9.0
  * https://github.com/jhudson8/backbone-async-event
  *
  * Copyright (c) 2014 Joe Hudson<joehud_AT_gmail.com>
