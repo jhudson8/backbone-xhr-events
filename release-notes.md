@@ -2,7 +2,14 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.1...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.2...master)
+
+## v0.8.2 - November 25th, 2014
+- update README - d0a7dea
+- bug fix: ensure that the xhr activity state is correct even if a success/error callback pukes - e8c1d97
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.1...v0.8.2)
 
 ## v0.8.1 - November 6th, 2014
 - add responseType to 'after-send' event - f60acdf
