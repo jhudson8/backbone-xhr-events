@@ -227,9 +227,8 @@ Almost all event names and model/global attributes can be overridden to suit you
 
 API: Events
 -----------
-### Model / Collection events
-
-#### "xhr" (method, context)
+### "xhr"
+Callback function arguments are (method, context)
 * ***method***: the Backbone sync method (by default, "read", "update", or "delete")
 * ***context***: the request context (see "Request Context" section)
 
@@ -253,7 +252,15 @@ model.on('xhr', function(method, context) {
 });
 ```
 
-#### "xhr:{method}" (context)
+Or, all xhr events are emitted globally on Backbone.xhrEvents.  The signature is similar except that the model is provided.
+```
+Backbone.xhrEvents.on('xhr', function(method, model, context) {
+  ...
+});
+```
+
+### "xhr:{method}"
+Callback function arguments are (context)
 * ***method***: the Backbone sync method (by default, "read", "update", or "delete")
 * ***context***: the request context (see "Request Context" section)
 
@@ -265,25 +272,18 @@ model.on('xhr:read', function(method, context) {
 });
 ```
 
-#### "xhr:complete" ()
+Or, all xhr events are emitted globally on Backbone.xhrEvents.  The signature is similar except that the model is provided.
+```
+Backbone.xhrEvents.on('xhr:read', function(method, model, context) {
+  ...
+});
+```
+
+### "xhr:complete"
+Callback function arguments are (context)
+* ***context***: the context representing the *last* XHR activity
 
 Emitted when any XHR activity has completed and there is no more concurrent XHR activity
-
-
-### Backbone.xhrEvents (global events)
-
-#### "xhr" (method, model, context)
-* ***method***: the Backbone sync method (by default, "read", "update", or "delete")
-* ***model***: the associated model
-* ***context***: the request context (see "Request Context" section)
-
-Emitted when any XHR activity occurs
-
-#### "xhr:{method}" (model, context)
-* ***model***: the associated model
-* ***context***: the request context (see "Request Context" section)
-
-Emitted when only XHR activity matching the method in the event name occurs
 
 
 API
