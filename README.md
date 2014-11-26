@@ -2,6 +2,8 @@ backbone-xhr-events
 ====================
 Do more than what the default [Backbone](http://http://backbonejs.org/) Model/Collection ```request``` event does for you.  The primary benefits are
 
+[View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-xhr-events) for a better docs experience
+
 * Provide robust lifecycle events (```before-send```, ```after-send```, ```success```, ```error```, ```complete```)
 * Emit type specific XHR events to allow for focused binding
 * Give ability to see if a model currently has any pending XHR activity
@@ -13,7 +15,25 @@ Do more than what the default [Backbone](http://http://backbonejs.org/) Model/Co
 * Give external entities a way to observe ajax activity on your Collections and Models
 
 
-[View the fancydocs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-xhr-events)
+Installation
+--------------
+Browser:
+```
+<script src=".../underscore[-min].js"></script>
+<script src=".../backbone[-min].js"></script>
+<script src=".../backbone-xhr-events[-min].js"></script>
+```
+CommonJS
+```
+require('backbone-xhr-events')(require('backbone'), require('underscore'));
+```
+AMD
+```
+require(
+  ['backbone', 'underscore', 'backbone-xhr-events'], function(Backbone, _, backboneXhrEvents) {
+  backboneXhrEvents(Backbone, _); 
+});
+```
 
 
 Sections
