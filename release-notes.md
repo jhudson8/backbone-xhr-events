@@ -2,7 +2,23 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.2...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.0...master)
+
+## v0.9.0 - November 26th, 2014
+- for AMD, you must execute the function with params (see README AMD install instructions) - da7c5d9
+```
+require(
+  ['backbone', 'underscore', 'backbone-xhr-events'], function(Backbone, _, backboneXhrEvents) {
+  backboneXhrEvents(Backbone, _); 
+});
+```
+The underscore impl must be provided to the CommonJS function (see README CommonJS install instructions)
+```
+require('backbone-xhr-events')(require('backbone'), require('underscore'));
+```
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.8.2...v0.9.0)
 
 ## v0.8.2 - November 25th, 2014
 - update README - d0a7dea
