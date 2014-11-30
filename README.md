@@ -39,45 +39,6 @@ require(
 Sections
 --------
 ### General Usage Examples
-Bind to a model to listen to all XHR activity
-```
-// method is "read", "save", or "delete" or custom (Backbone.sync method)
-// context is a Backbone.Events to bind to XHR lifecycle events
-model.on('xhr', function(method, context) {
-  // 'xhr' event is sent before core Backbone.sync is executed
-
-  // xhr = the XMLHttpRequest; settings = $.ajax settings
-  context.on('before-send', function(xhr, settings, context) {
-    // after core Backbone.sync has executed $.ajax and an XMLHttpRequest has been created
-    // but before the XHR has been executed = $.ajax settings
-  });
-
-  context.on('after-send', function(p1, p2, p3, responseType {
-    // after the XHR has returned but before Backbone.sync has handled the response
-
-    if (responseType === 'success') {
-      // additional params are (data, status, xhr, context);
-    }
-    if (responseType === 'error') {
-      // additional params are (xhr, type, error)
-    }
-
-  });
-
-  context.on('success', function(context) {
-    // this will be called after the XHR succeeds
-  });
-
-  context.on('error', function(xhr, type, error, context) {
-    // this will be called if the XHR fails
-  });
-
-  context.on('complete', function(type, {type specific args}) {
-    // type will either be "success" or "error" and the type specific args are the same as what is provided to the respective events
-    // this will be called when the XHR succeeds or fails
-  });
-});
-```
 
 Bind to a model to listen to only fetches
 ```
@@ -249,8 +210,9 @@ API: Events
 -----------
 ### "xhr"
 Callback function arguments are (method, context)
+
 * ***method***: the Backbone sync method (by default, "read", "update", or "delete")
-* ***context***: the request context (see "Request Context" section)
+* ***context***: the request context (see [RequestContext](#section/Request%20Context))
 
 Emitted when any XHR activity occurs
 
@@ -281,8 +243,9 @@ Backbone.xhrEvents.on('xhr', function(method, model, context) {
 
 ### "xhr:{method}"
 Callback function arguments are (context)
+
 * ***method***: the Backbone sync method (by default, "read", "update", or "delete")
-* ***context***: the request context (see "Request Context" section)
+* ***context***: the request context (see [RequestContext](#section/Request%20Context))
 
 Emitted when only XHR activity matching the method in the event name occurs
 
@@ -301,7 +264,8 @@ Backbone.xhrEvents.on('xhr:read', function(method, model, context) {
 
 ### "xhr:complete"
 Callback function arguments are (context)
-* ***context***: the context representing the *last* XHR activity
+
+* ***context***: the context representing the *last* XHR activity (see [RequestContext](#section/Request%20Context))
 
 Emitted when any XHR activity has completed and there is no more concurrent XHR activity
 
