@@ -17,6 +17,9 @@
   "scripts": {
     "test": "mocha"
   },
+  "scripts": {
+    "test": "mocha"
+  },
   "dependencies": {
     "underscore": "*"
   },
