@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.1...master)
+
+## v0.9.1 - December 2nd, 2014
+- allow fetch state flags to be reset if the collection has been reset or the model has been cleared - e4db226
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.0...v0.9.1)
 
 ## v0.9.0 - November 26th, 2014
 - for AMD, you must execute the function with params (see README AMD install instructions) - da7c5d9
