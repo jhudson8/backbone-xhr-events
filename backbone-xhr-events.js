@@ -262,4 +262,17 @@
     return context;
   }
 
+  // allow fetch state flags to be reset if the collection has been reset or the model has been cleared
+  _.each({
+    'reset': Backbone.Collection,
+    'clear': Backbone.Model
+  }, function(Clazz, key) {
+    var protoFunc = Clazz.prototype[key];
+    Clazz.prototype[key] = function(models) {
+      if (key === 'clear' || _.isUndefined(models)) {
+        this.hasBeenFetched = this.hadFetchError = false;
+      }
+    }
+  });
+
 });

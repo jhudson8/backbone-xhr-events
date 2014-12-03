@@ -549,4 +549,23 @@ describe("backbone-xhr-events", function () {
 
   });
 
+  describe('fetch state flag clearing', function() {
+    it('should clear collection flags on reset', function() {
+      var collection = new Backbone.Collection();
+      collection.hasBeenFetched = true;
+      collection.hadFetchError = true;
+      collection.reset();
+      expect(collection.hasBeenFetched).to.eql(false);
+      expect(collection.hadFetchError).to.eql(false);
+    });
+    it('should clear model flags on clear', function() {
+      var model = new Backbone.Model();
+      model.hasBeenFetched = true;
+      model.hadFetchError = true;
+      model.clear();
+      expect(model.hasBeenFetched).to.eql(false);
+      expect(model.hadFetchError).to.eql(false);
+    });
+  });
+
 });
