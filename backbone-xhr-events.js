@@ -272,6 +272,7 @@
       if (key === 'clear' || _.isUndefined(models)) {
         this.hasBeenFetched = this.hadFetchError = false;
       }
+      protoFunc.apply(this, arguments);
     }
   });
 
