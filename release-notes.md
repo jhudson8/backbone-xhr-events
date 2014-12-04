@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.1...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.2...master)
+
+## v0.9.2 - December 4th, 2014
+- fetch bug fix - eb10cd0
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.1...v0.9.2)
 
 ## v0.9.1 - December 2nd, 2014
 - allow fetch state flags to be reset if the collection has been reset or the model has been cleared - e4db226
