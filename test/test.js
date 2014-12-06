@@ -566,6 +566,17 @@ describe("backbone-xhr-events", function () {
       expect(model.hasBeenFetched).to.eql(false);
       expect(model.hadFetchError).to.eql(false);
     });
+    it('should forward to Backbone.Model/Collection', function() {
+      var model = new Backbone.Model();
+      var collection = new Backbone.Collection();
+      var resetSpy = sinon.spy();
+      sinon.stub(model, 'set');
+      collection.on('reset', resetSpy);
+      model.clear();
+      collection.reset();
+      expect(model.set.callCount).to.eql(1);
+      expect(resetSpy.callCount).to.eql(1);
+    })
   });
 
 });
