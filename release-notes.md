@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.2...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.3...master)
+
+## v0.9.3 - December 7th, 2014
+- API change forwardXhrEvents -> forwardXHREvents and stopXhrForwarding -> stopXHRForwarding - 9d0d67b
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.2...v0.9.3)
 
 ## v0.9.2 - December 4th, 2014
 - fetch bug fix - eb10cd0
