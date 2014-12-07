@@ -449,7 +449,7 @@ describe("backbone-xhr-events", function () {
         source = new XhrModel(),
         receiver = new Backbone.Model();
 
-      Backbone.forwardXhrEvents(source, receiver);
+      Backbone.forwardXHREvents(source, receiver);
       receiver.on('xhr:read', eventSpy);
       receiver.on('xhr:complete', receiverCompleteSpy);
       source.on('xhr:complete', sourceCompleteSpy);
@@ -480,7 +480,7 @@ describe("backbone-xhr-events", function () {
       expect(sourceCompleteSpy.callCount).to.eql(2);
 
       // make sure we can cancel the forwarding
-      Backbone.stopXhrForwarding(source, receiver);
+      Backbone.stopXHRForwarding(source, receiver);
       source.fetch();
       expect(eventSpy.callCount).to.eql(2);
       expect(source.xhrActivity.length).to.eql(1);
@@ -505,7 +505,7 @@ describe("backbone-xhr-events", function () {
         source = new XhrModel(),
         receiver = new Backbone.Model();
 
-      Backbone.forwardXhrEvents(source, receiver, 'delete');
+      Backbone.forwardXHREvents(source, receiver, 'delete');
       receiver.on('xhr', eventSpy);
       source.fetch();
       $.success({});
@@ -533,7 +533,7 @@ describe("backbone-xhr-events", function () {
         receiver = new Backbone.Model();
 
       receiver.on('xhr', eventSpy);
-      Backbone.forwardXhrEvents(source, receiver, function () {
+      Backbone.forwardXHREvents(source, receiver, function () {
         source.fetch();
       });
       // we should not be forwarding anymore

@@ -119,17 +119,17 @@ Forward xhr events to another model
 (source model will continue to emit xhr events as well)
 ```
 // forward all events
-Backbone.forwardXhrEvents(sourceModel, receiverModel);
+Backbone.forwardXHREvents(sourceModel, receiverModel);
 // stop forwarding all events
-Backbone.stopXhrForwarding(sourceModel, receiverModel);
+Backbone.stopXHRForwarding(sourceModel, receiverModel);
 
 // forward events for a specific Backbone.sync method
-Backbone.forwardXhrEvents(sourceModel, receiverModel, 'read');
+Backbone.forwardXHREvents(sourceModel, receiverModel, 'read');
 // stop forwarding all events
-Backbone.stopXhrForwarding(sourceModel, receiverModel, 'read');
+Backbone.stopXHRForwarding(sourceModel, receiverModel, 'read');
 
 // forward events *only while the callback function is executed*
-Backbone.forwardXhrEvents(sourceModel, receiverModel, function() {
+Backbone.forwardXHREvents(sourceModel, receiverModel, function() {
   // any XHR activity that sourceModel executes will be emitted by
   // receiverModel as well
 });
@@ -293,7 +293,7 @@ myModel.whenFetched(function(model) {
 
 ### Backbone
 
-#### forwardXhrEvents (sourceModel, destModel[, method]) or (sourceModel, destModel, autoStopFunc)
+#### forwardXHREvents (sourceModel, destModel[, method]) or (sourceModel, destModel, autoStopFunc)
 * ***sourceModel***: the originator model of the XHR events
 * ***destModel***: the receiver or proxy of the source model XHR events
 * ***method***: the optional Backbone.sync method to filter the forwarded events
@@ -309,16 +309,16 @@ var CompositeModel = Backbone.Model.extend({
     // when model1 or model2 have xhr activity, "this" will expose the same xhr events
     Backbone.Model.prototype.initialize.apply(this, arguments);
     this.model1 = new Backbone.Model();
-    Backbone.forwardXhrEvents(this.model1, this);
+    Backbone.forwardXHREvents(this.model1, this);
     this.model2 = new Backbone.Model();
-    Backbone.forwardXhrEvents(this.model2, this);
+    Backbone.forwardXHREvents(this.model2, this);
   }
 });
 ```
 
-#### stopXhrForwarding (sourceModel, destModel[, method])
+#### stopXHRForwarding (sourceModel, destModel[, method])
 * ***sourceModel***: the originator model of the XHR events
 * ***destModel***: the receiver or proxy of the source model XHR events
 * ***method***: the optional Backbone.sync method to filter the forwarded events
 
-Stop forwarding XHR events.  This must match a previous ```forwardXhrEvents``` call.
+Stop forwarding XHR events.  This must match a previous ```forwardXHREvents``` call.

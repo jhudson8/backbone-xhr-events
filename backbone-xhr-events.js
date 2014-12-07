@@ -130,7 +130,8 @@
   }
 
   // forward all or some XHR events from the source object to the dest object
-  Backbone.forwardXhrEvents = function (source, dest, typeOrCallback) {
+  // FIXME remove humpback case names after next minor release
+  Backbone.forwardXhrEvents = Backbone.forwardXHREvents = function (source, dest, typeOrCallback) {
     var handler = handleForwardedEvents(!_.isFunction(typeOrCallback) && typeOrCallback);
     if (_.isFunction(typeOrCallback)) {
       // forward the events *only* while the function is executing wile keeping "this" as the context
@@ -146,7 +147,8 @@
     }
   }
 
-  Backbone.stopXhrForwarding = function (source, dest, type) {
+  // FIXME remove humpback case names after next minor release
+  Backbone.stopXhrForwarding = Backbone.stopXHRForwarding = function (source, dest, type) {
     var handler = handleForwardedEvents(type),
       eventName = type ? (xhrEventName + ':') + type : xhrEventName;
     source.off(xhrEventName, handler, dest);
