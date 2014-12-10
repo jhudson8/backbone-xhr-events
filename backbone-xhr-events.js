@@ -41,7 +41,7 @@
   }
 })(function (Backbone, _) {
 
-  // react-backbone:with-deps start
+  // main body start
   // ANY OVERRIDES MUST BE DEFINED BEFORE LOADING OF THIS SCRIPT
   // Backbone.xhrCompleteEventName: event triggered on models when all XHR requests have been completed
   var xhrCompleteEventName = Backbone.xhrCompleteEventName = Backbone.xhrCompleteEventName || 'xhr:complete';
@@ -278,5 +278,6 @@
       protoFunc.apply(this, arguments);
     }
   });
-  // react-backbone:with-deps end
+  // main body end
+
 });
