@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.3...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.4...master)
+
+## v0.9.4 - December 10th, 2014
+no functional code changes.  There is just an additional comment that is used to create react-backbone/with-deps.js
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.3...v0.9.4)
 
 ## v0.9.3 - December 7th, 2014
 - API change forwardXhrEvents -> forwardXHREvents and stopXhrForwarding -> stopXHRForwarding - 9d0d67b
