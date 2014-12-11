@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.4...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.5...master)
+
+## v0.9.5 - December 11th, 2014
+- code cleanup - 636e162
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.4...v0.9.5)
 
 ## v0.9.4 - December 10th, 2014
 no functional code changes.  There is just an additional comment that is used to create react-backbone/with-deps.js
