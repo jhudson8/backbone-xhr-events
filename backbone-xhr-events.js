@@ -219,44 +219,52 @@
             var _type = options[type];
             // success: (data, status, xhr);  error: (xhr, type, error)
             options[type] = function(p1, p2, p3) {
+                var self = this;
+                var _contextArgs = context.args = [p1, p2, p3];
+                context.finish = finish;
+
+                function finish() {
+                    // options callback
+                    try {
+                        if (_type) {
+                            _type.apply(self, context.args);
+                        }
+                    } finally {
+                        // remove the load entry
+                        var index = loads.indexOf(context);
+                        if (index >= 0) {
+                            loads.splice(index, 1);
+                        }
+
+                        // if there are no more cuncurrent XHRs, model[xhrLoadingAttribute] should always be undefind
+                        if (loads.length === 0) {
+                            model[xhrLoadingAttribute] = undefined;
+                            model.trigger(xhrCompleteEventName, context);
+                        }
+                    }
+
+                    // trigger the success/error event
+                    var args = (type === SUCCESS) ? [type, context] : [type, _contextArgs[0], _contextArgs[1], _contextArgs[2], context];
+                    context.trigger.apply(context, args);
+
+                    // trigger the complete event
+                    args.splice(0, 0, 'complete');
+                    context.trigger.apply(context, args);
+                }
+
                 if (type === SUCCESS && !context.preventDefault) {
                     // trigger the "data" event which allows manipulation of the response before any other events or callbacks are fired
                     context.trigger('after-send', p1, p2, p3, type, context);
-                    p1 = context.data || p1;
+                    _contextArgs[0] = context.data || _contextArgs[0];
                     // if context.preventDefault is true, it is assumed that the option success or callback will be manually called
                     if (context.preventDefault) {
                         return;
                     }
                 }
-
-                // options callback
-                try {
-                    if (_type) {
-                        _type.call(this, p1, p2, p3);
-                    }
-                } finally {
-                    // remove the load entry
-                    var index = loads.indexOf(context);
-                    if (index >= 0) {
-                        loads.splice(index, 1);
-                    }
-
-                    // if there are no more cuncurrent XHRs, model[xhrLoadingAttribute] should always be undefind
-                    if (loads.length === 0) {
-                        model[xhrLoadingAttribute] = undefined;
-                        model.trigger(xhrCompleteEventName, context);
-                    }
-                }
-
-                // trigger the success/error event
-                var args = (type === SUCCESS) ? [type, context] : [type, p1, p2, p3, context];
-                context.trigger.apply(context, args);
-
-                // trigger the complete event
-                args.splice(0, 0, 'complete');
-                context.trigger.apply(context, args);
+                context.finish();
             };
         }
+
         onComplete(SUCCESS);
         onComplete(ERROR);
 
