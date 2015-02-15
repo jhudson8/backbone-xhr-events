@@ -13,9 +13,3 @@ Do more than what the default [Backbone](http://http://backbonejs.org/) Model/Co
 * Give external entities a way to observe ajax activity on your Collections and Models
 
 [View the installation and API docs](http://jhudson8.github.io/fancydocs/index.html#project/jhudson8/backbone-xhr-events) for a better docs experience
-
-## Support me
-
-If you like this project you may support me by donating something on Gittip, starring this repository or reporting bugs and ideas in the issue section.
-
-[![gittip](http://jhudson8.github.io/react-mixin-manager/gittip-button.jpg)](https://gratipay.com/jhudson8/)
