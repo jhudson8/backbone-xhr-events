@@ -2,7 +2,28 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.5...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.10.0...master)
+
+## v0.10.0 - February 15th, 2015
+- make preventDefault a function rather than a boolean value to be set on the context
+- add a "finish" function attribute on context which *must* be called if preventDefault is called in "after-send"
+
+```
+      context.on('after-send', function(data, status, xhr, responseType) {
+        context.preventDefault();
+        context.finish({
+          // indicate that the xhr callbacks will be handled manually
+          preventCallbacks: true,
+	  // indicate that the lifecycle events will be handled manually
+	  preventEvents: true
+        });
+      });
+```
+
+See API docs for added examples which demonstrate how this can be used
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.9.5...v0.10.0)
 
 ## v0.9.5 - December 11th, 2014
 - code cleanup - 636e162
