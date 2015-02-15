@@ -75,7 +75,7 @@ describe("backbone-xhr-events", function () {
           if (match) {
             match.on('after-send', context.options.success);
             match.on('error', context.options.error);
-            context.preventDefault = true;
+            context.preventDefault();
           }
         });
       }
@@ -355,11 +355,37 @@ describe("backbone-xhr-events", function () {
       model.on('xhr', eventSpy);
       model.fetch({});
       expect(eventSpy.callCount).to.eql(1);
-      $.success('{"foo": "bar"}', 'status', 'xhr');
-      expect(origResponseData).to.eql('{"foo": "bar"}');
+      $.success({"foo": "bar"}, 'status', 'xhr');
+      expect(origResponseData).to.eql({"foo": "bar"});
       expect(dataId).to.eql(0);
       expect(successId).to.eql(1);
       expect(model.get('abc')).to.eql('def');
+    });
+
+    it("should allow 'context.finish' to be called from the 'after-send' event handler", function () {
+      var count = 0,
+        origResponseData,
+        successId,
+        dataId,
+        successSpy = sinon.spy(),
+        afterSendSpy = function (data, status, xhr, responseType, context) {
+          setTimeout(function() {
+            context.finish();
+          }, 1);
+          context.preventDefault();
+        },
+        eventSpy = sinon.spy(function (type, events) {
+          events.on('success', successSpy);
+          events.on('after-send', afterSendSpy);
+        });
+
+      model.on('xhr', eventSpy);
+      model.fetch();
+      $.success({"foo": "bar"}, 'status', 'xhr');
+      expect(successSpy.callCount).to.eql(0);
+      clock.tick(2);
+      expect(successSpy.callCount).to.eql(1);
+      expect(model.get('foo')).to.eql('bar');
     });
 
     it("triggers xhr:complete after all xhr activities have completed", function () {
@@ -576,7 +602,7 @@ describe("backbone-xhr-events", function () {
       collection.reset();
       expect(model.set.callCount).to.eql(1);
       expect(resetSpy.callCount).to.eql(1);
-    })
+    });
   });
 
 });

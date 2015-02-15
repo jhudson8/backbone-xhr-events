@@ -71,6 +71,9 @@
             }
         }
     };
+    Context.prototype.preventDefault = function() {
+        this._defaultPrevented = true;
+    };
     _.extend(Context.prototype, Backbone.Events);
 
     // allow backbone to send xhr events on models
@@ -84,7 +87,7 @@
         }
 
         var context = initializeXHRLoading(method, model, model, options);
-        if (context.preventDefault) {
+        if (context._defaultPrevented) {
             // it is assumed that either context.options.success or context.options.error will be called
             return;
         }
@@ -209,7 +212,7 @@
                 }
             }
             context.trigger('before-send', xhr, settings, context);
-            if (context.preventDefault) {
+            if (context._defaultPrevented) {
                 return false;
             }
             loads.push(context);
@@ -223,10 +226,10 @@
                 var _contextArgs = context.args = [p1, p2, p3];
                 context.finish = finish;
 
-                function finish() {
+                function finish(_options) {
                     // options callback
                     try {
-                        if (_type) {
+                        if (_type && (!_options || !_options.preventCallbacks)) {
                             _type.apply(self, context.args);
                         }
                     } finally {
@@ -248,16 +251,18 @@
                     context.trigger.apply(context, args);
 
                     // trigger the complete event
-                    args.splice(0, 0, 'complete');
-                    context.trigger.apply(context, args);
+                    if (!_options || !_options.preventEvents) {
+                        args.splice(0, 0, 'complete');
+                        context.trigger.apply(context, args);
+                    }
                 }
 
-                if (type === SUCCESS && !context.preventDefault) {
+                if (type === SUCCESS && !context._defaultPrevented) {
                     // trigger the "data" event which allows manipulation of the response before any other events or callbacks are fired
                     context.trigger('after-send', p1, p2, p3, type, context);
                     _contextArgs[0] = context.data || _contextArgs[0];
                     // if context.preventDefault is true, it is assumed that the option success or callback will be manually called
-                    if (context.preventDefault) {
+                    if (context._defaultPrevented) {
                         return;
                     }
                 }

@@ -11,22 +11,28 @@
 
 Installation
 --------------
+
 Browser:
+
 ```
-<script src=".../underscore[-min].js"></script>
-<script src=".../backbone[-min].js"></script>
-<script src=".../backbone-xhr-events[-min].js"></script>
+    <script src=".../underscore[-min].js"></script>
+    <script src=".../backbone[-min].js"></script>
+    <script src=".../backbone-xhr-events[-min].js"></script>
 ```
+
 CommonJS
+
 ```
-require('backbone-xhr-events')(require('backbone'), require('underscore'));
+    require('backbone-xhr-events')(require('backbone'), require('underscore'));
 ```
+
 AMD
+
 ```
-require(
-  ['backbone', 'underscore', 'backbone-xhr-events'], function(Backbone, _, backboneXhrEvents) {
-  backboneXhrEvents(Backbone, _); 
-});
+    require(
+      ['backbone', 'underscore', 'backbone-xhr-events'], function(Backbone, _, backboneXhrEvents) {
+      backboneXhrEvents(Backbone, _); 
+    });
 ```
 
 
@@ -35,131 +41,170 @@ Sections
 ### General Usage Examples
 
 Bind to a model to listen to only fetches
+
 ```
-model.on('xhr:read', function(context) {
-  ...
-});
+    model.on('xhr:read', function(context) {
+      ...
+    });
 ```
 
 Override the XHR payload or cache it
+
 ```
-Backbone.xhrEvents.on('xhr', function(method, model, context) {
-  context.on('after-send', function(data, status, xhr, responseType, context) {
-    if (responseType === 'success') {
-      // wrap the response as a "response" attribute
-      context.data = { response: data };
-      // cache the response
-      if (method === 'read') {
-        _cacheFetchResponse(JSON.stringify(data), context.options.url);
-      }
-    }
-  });
-});
+    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+      context.on('after-send', function(data, status, xhr, responseType, context) {
+        if (responseType === 'success') {
+          // wrap the response as a "response" attribute
+          context.data = { response: data };
+          // cache the response
+          if (method === 'read') {
+            _cacheFetchResponse(JSON.stringify(data), context.options.url);
+          }
+        }
+      });
+    });
 ```
 
 Intercept a request and return a cached payload
+
 ```
-Backbone.xhrEvents.on('xhr', function(method, model, context) {
-  if (context.method === 'read') {
-    var cachedResult = _getFetchCache(context.options.url);
-    if (cachedResult) {
-      context.preventDefault = true;
-      options.success(JSON.parse(cachedResult), 'success');
-    }
-  }
-});
+    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+      if (context.method === 'read') {
+        var cachedResult = _getFetchCache(context.options.url);
+        if (cachedResult) {
+          context.preventDefault();
+          options.success(JSON.parse(cachedResult), 'success');
+        }
+      }
+    });
 ```
 
 Make a successful XHR look like a failure
-```
-model.on('xhr', function(method, context) {
-  context.on('after-send', function(data, status, xhr, responseType) {
-    if (!context.preventDefault) {
-      // we don't want to call success/error callback more than once
-      context.preventDefault = true;
 
-      // provide the parameters that you would have wanted coming back directly from the $.ajax callback
-      context.options.error(...);
-    }
-  });
-});
+```
+    model.on('xhr', function(method, context) {
+      context.on('after-send', function(data, status, xhr, responseType) {
+        context.preventDefault();
+        context.finish({
+          // indicate that the xhr callbacks will be handled manually
+          preventCallbacks: true
+        });
+
+        // provide the parameters that you would have wanted coming back directly from the $.ajax callback
+        context.options.error(...);
+      });
+    });
+```
+
+Alter the payload asynchronously after the initial response is returned
+
+```
+    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+      context.on('after-send', function(data, status, xhr, responseType) {
+        context.preventDefault();
+        yourOwnGetDataAsyncMethod(function(data) {
+          context.data = data;
+          context.finish();
+        });
+      });
+    });
+```
+
+Add simulated 1 second latency
+
+```
+    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+      context.on('after-send', function(data, status, xhr, responseType) {
+        context.preventDefault();
+        setTimeout(context.finish, 1000);
+      });
+    });
 ```
 
 Set a default timeout on all XHR activity
+
 ```
-Backbone.xhrEvents.on('xhr', function(method, model, context) {
-  context.options.timeout = 3000;
-});
+    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+      context.options.timeout = 3000;
+    });
 ```
 
 Determine fetch status of a model
+
 ```
-model.fetch();
-!!model.xhrActivity === true;
+    model.fetch();
+    !!model.xhrActivity === true;
 
-// model fetch complete now
-!!model.xhrActivity === false;
+    // model fetch complete now
+    !!model.xhrActivity === false;
 
-// if the model fetch succeeded
-model.hasBeenFetched === true;
-model.hadFetchError === false;
+    // if the model fetch succeeded
+    model.hasBeenFetched === true;
+    model.hadFetchError === false;
 
-// if the model fetch has failed...
-model.hadFetchError === true;
-model.hasBeenFetched === false;
+    // if the model fetch has failed...
+    model.hadFetchError === true;
+    model.hasBeenFetched === false;
 ```
 
 Forward xhr events to another model
 (source model will continue to emit xhr events as well)
+
 ```
-// forward all events
-Backbone.forwardXHREvents(sourceModel, receiverModel);
-// stop forwarding all events
-Backbone.stopXHRForwarding(sourceModel, receiverModel);
+    // forward all events
+    Backbone.forwardXHREvents(sourceModel, receiverModel);
+    // stop forwarding all events
+    Backbone.stopXHRForwarding(sourceModel, receiverModel);
 
-// forward events for a specific Backbone.sync method
-Backbone.forwardXHREvents(sourceModel, receiverModel, 'read');
-// stop forwarding all events
-Backbone.stopXHRForwarding(sourceModel, receiverModel, 'read');
+    // forward events for a specific Backbone.sync method
+    Backbone.forwardXHREvents(sourceModel, receiverModel, 'read');
+    // stop forwarding all events
+    Backbone.stopXHRForwarding(sourceModel, receiverModel, 'read');
 
-// forward events *only while the callback function is executed*
-Backbone.forwardXHREvents(sourceModel, receiverModel, function() {
-  // any XHR activity that sourceModel executes will be emitted by
-  // receiverModel as well
-});
+    // forward events *only while the callback function is executed*
+    Backbone.forwardXHREvents(sourceModel, receiverModel, function() {
+      // any XHR activity that sourceModel executes will be emitted by
+      // receiverModel as well
+    });
 ```
 
 Prevent duplicate concurrent submission of any XHR request
-```
-Backbone.xhrEvents.on('xhr', function(method, model, context) {
-  context.on('before-send', function(xhr, settings) {
-    // we need to use before-send because Backbone.sync creates settings.data
 
-    // see if any current XHR activity matches this request
-    var match = _.find(model.xhrActivity, function(_context) {
-      return context.options.url === _context.options.url
-          && method === _context.method
-          && _.isEqual(settings.data, _context.settings.data);
+```
+    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+      context.on('before-send', function(xhr, settings) {
+        // we need to use before-send because Backbone.sync creates settings.data
+
+        // see if any current XHR activity matches this request
+        var match = _.find(model.xhrActivity, function(_context) {
+          return context.options.url === _context.options.url
+              && method === _context.method
+              && _.isEqual(settings.data, _context.settings.data);
+        });
+        if (match) {
+          // when the pending request comes back, simulate the same activity on this request
+          match.on('after-send', context.options.success);
+          match.on('error', context.options.error);
+          context.preventDefault();
+        }
+      });
     });
-    if (match) {
-      // when the pending request comes back, simulate the same activity on this request
-      match.on('after-send', context.options.success);
-      match.on('error', context.options.error);
-      context.preventDefault = true;
-    }
-  });
-});
 ```
 
 Prevent the error callback if the request is aborted
+
 ```
-Backbone.xhrEvents.on('xhr', function(method, model, context) {
-  context.on('after-send', function(xhr, errorType, error, responseType) {
-    if (errorType === 'abort') {
-      context.preventDefault = true;
-    }
-  });
-});
+    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+      context.on('after-send', function(xhr, errorType, error, responseType) {
+        if (errorType === 'abort') {
+          context.preventDefault();
+          context.finish({
+            preventCallbacks: true,
+            preventEvents: true
+          });
+        }
+      });
+    });
 ```
 
 ### Request Context
@@ -182,10 +227,17 @@ The following read-only context attributes are applicable
 * ***xhr***: the actual XMLHttpRequest
 * ***method***: the Backbone.sync method
 * ***model***: the associated model
+* ***finish***: function which should only be called from "after-send" if context.preventDefault() was executed
 
-These attributes can be set on the context to alter lifecycle behavior
+The ```finish``` method *must* be called if ```context.preventDefault``` is executed in the ```after-send``` event.  It can be called with an optional object with the following attributes
 
-* ***preventDefault***: set this value as true at any stage to prevent further processing.  In this case, you must context.options callbacks manually or they will not be called at all.
+* ***preventCallbacks***: Prevent the ajax callbacks from being executed
+* ***preventEvents***: Prevent triggering of the lifecycle context events
+
+These context attributes/functions can be executed on the context to alter lifecycle behavior
+
+* ***preventDefault***: execute at any stage to prevent further processing.  In this case, you must context.options callbacks manually or they will not be called at all.  If executed in ```after-send```, ```context.finish``` *must* be executed
+* ***finish***: function to execute if the default behavior was prevented from ```after-send```
 * ***data***: set this value within an "after-send" event handler to override the standard response data
 
 #### Context methods
@@ -211,28 +263,29 @@ Callback function arguments are (method, context)
 Emitted when any XHR activity occurs
 
 ```
-model.on('xhr', function(method, context) {
-  // method is "read", "save", or "delete" or custom (Backbone.sync method)
-  // context is a Backbone.Events to bind to XHR lifecycle events
+    model.on('xhr', function(method, context) {
+      // method is "read", "save", or "delete" or custom (Backbone.sync method)
+      // context is a Backbone.Events to bind to XHR lifecycle events
 
-  context.on('complete', function(type, {type specific args}) {
-    // type will either be "success" or "error" and the type specific args are the same as what is provided to the respective events
-    // this will be called when the XHR succeeds or fails
-  });
-  context.on('success', function(model) {
-    // this will be called after the XHR succeeds
-  });
-  context.on('error', function(model, xhr, type, error) {
-    // this will be called if the XHR fails
-  });
-});
+      context.on('complete', function(type, {type specific args}) {
+        // type will either be "success" or "error" and the type specific args are the same as what is provided to the respective events
+        // this will be called when the XHR succeeds or fails
+      });
+      context.on('success', function(model) {
+        // this will be called after the XHR succeeds
+      });
+      context.on('error', function(model, xhr, type, error) {
+        // this will be called if the XHR fails
+      });
+    });
 ```
 
 Or, all xhr events are emitted globally on Backbone.xhrEvents.  The signature is similar except that the model is provided.
+
 ```
-Backbone.xhrEvents.on('xhr', function(method, model, context) {
-  ...
-});
+    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+      ...
+    });
 ```
 
 ### "xhr:{method}"
@@ -244,16 +297,17 @@ Callback function arguments are (context)
 Emitted when only XHR activity matching the method in the event name occurs
 
 ```
-model.on('xhr:read', function(method, context) {
-  ...
-});
+    model.on('xhr:read', function(method, context) {
+      ...
+    });
 ```
 
 Or, all xhr events are emitted globally on Backbone.xhrEvents.  The signature is similar except that the model is provided.
+
 ```
-Backbone.xhrEvents.on('xhr:read', function(method, model, context) {
-  ...
-});
+    Backbone.xhrEvents.on('xhr:read', function(method, model, context) {
+      ...
+    });
 ```
 
 ### "xhr:complete"
@@ -275,13 +329,13 @@ API
 Initiate a fetch if not already fetching or fetched.  Once the model/collection has been fetch, execute the appropriate callback.
 
 ```
-myModel.whenFetched(function(model) {
-    // executed when model is fetched (model and myModel are the same)
-  },
-  function(model) {
-    // executed if the model fetch fails
-  }
-);
+    myModel.whenFetched(function(model) {
+        // executed when model is fetched (model and myModel are the same)
+      },
+      function(model) {
+        // executed if the model fetch fails
+      }
+    );
 ```
 
 
@@ -298,16 +352,16 @@ Forward XHR events that originate in ```sourceModel``` to ```destModel```.  Thes
 This can be useful if you have a composite model containing sub-models and want to aggregate xhr activity to the composite model.
 
 ```
-var CompositeModel = Backbone.Model.extend({
-  initialize: function() {
-    // when model1 or model2 have xhr activity, "this" will expose the same xhr events
-    Backbone.Model.prototype.initialize.apply(this, arguments);
-    this.model1 = new Backbone.Model();
-    Backbone.forwardXHREvents(this.model1, this);
-    this.model2 = new Backbone.Model();
-    Backbone.forwardXHREvents(this.model2, this);
-  }
-});
+    var CompositeModel = Backbone.Model.extend({
+      initialize: function() {
+        // when model1 or model2 have xhr activity, "this" will expose the same xhr events
+        Backbone.Model.prototype.initialize.apply(this, arguments);
+        this.model1 = new Backbone.Model();
+        Backbone.forwardXHREvents(this.model1, this);
+        this.model2 = new Backbone.Model();
+        Backbone.forwardXHREvents(this.model2, this);
+      }
+    });
 ```
 
 #### stopXHRForwarding (sourceModel, destModel[, method])
