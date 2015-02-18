@@ -189,7 +189,7 @@
                 sourceModel.on(xhrEventName, handler, destModel);
                 typeOrCallback.call(this);
             } finally {
-                sourceModel.off(xhrEventName, handler, destModel);
+                Backbone.stopXHRForwarding(sourceModel, destModel);
             }
         } else {
             var eventName = typeOrCallback ? (xhrEventName + ':') + typeOrCallback : xhrEventName;
@@ -203,7 +203,19 @@
         var eventForwarders = getEventForwardingCache(sourceModel, destModel),
             handler = eventForwarders[type];
         if (handler) {
+            delete eventForwarders[type];
             sourceModel.off(xhrEventName, handler, destModel);
+        }
+
+        // clear model cache
+        var count = 0;
+        _.each(eventForwarders, function() { count ++; });
+        if (!count) {
+            delete sourceModel._eventForwarders[destModel];
+            _.each(sourceModel._eventForwarders, function() { count ++; });
+            if (!count) {
+                delete sourceModel._eventForwarders;
+            }
         }
     };
 

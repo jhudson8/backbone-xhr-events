@@ -501,6 +501,7 @@ describe("backbone-xhr-events", function () {
 
       // make sure we can cancel the forwarding
       Backbone.stopXHRForwarding(source, receiver);
+      expect(source._eventForwarders).to.eql(undefined);
       source.fetch();
       expect(eventSpy.callCount).to.eql(2);
       expect(source.xhrActivity.length).to.eql(1);
@@ -556,6 +557,7 @@ describe("backbone-xhr-events", function () {
       Backbone.forwardXHREvents(source, receiver, function () {
         source.fetch();
       });
+      expect(source._eventForwarders).to.eql(undefined);
       // we should not be forwarding anymore
       $.success({});
       // but the success should still be forwarded since the fetch was called during forwarding
