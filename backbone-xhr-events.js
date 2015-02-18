@@ -61,20 +61,64 @@
         this.method = method;
         this.model = model;
         this.options = options;
+        this._handler = {};
     };
-    Context.prototype.abort = function() {
-        if (!this.aborted) {
-            this.aborted = true;
-            this.preventDefault = true;
-            if (this.xhr) {
-                this.xhr.abort();
+    _.extend(Context.prototype, {
+        abort: function() {
+            if (!this.aborted) {
+                this.aborted = true;
+                this.type = 'abort';
+                this._defaultPrevented = true;
+                if (this.xhr) {
+                    this.xhr.abort();
+                }
             }
+        },
+
+        preventDefault: function() {
+            this._defaultPrevented = true;
+            return this._handler;
+        },
+
+        triggerAll: function() {
+            var args = _.toArray(arguments);
+            args.push(this);
+            this.trigger.apply(this, args);
+            _.each(this._forwardTo, function(context) {
+                args.splice(args.length-1, 1, context);
+                context.triggerAll.apply(context, args);
+            });
+        },
+
+        pushLoadActivity: function() {
+            var model = this.model,
+                loads = model[xhrLoadingAttribute] = (model[xhrLoadingAttribute] || []);
+            loads.push(this);
+            _.each(this._forwardTo, function(context) {
+                context.pushLoadActivity();
+            });
+        },
+
+        removeLoadEntry: function() {
+            function _remove(context) {
+                var model = context.model,
+                    loads = model[xhrLoadingAttribute] || [],
+                    index = loads.indexOf(context);
+                if (index >= 0) {
+                    loads.splice(index, 1);
+                }
+
+                // if there are no more cuncurrent XHRs, model[xhrLoadingAttribute] should always be undefind
+                if (loads.length === 0) {
+                    model[xhrLoadingAttribute] = undefined;
+                    model.trigger(xhrCompleteEventName, context);
+                }
+            }
+            _remove(this);
+            _.each(this._forwardTo, _remove);
         }
-    };
-    Context.prototype.preventDefault = function() {
-        this._defaultPrevented = true;
-    };
-    _.extend(Context.prototype, Backbone.Events);
+    }, Backbone.Events);
+
 
     // allow backbone to send xhr events on models
     var _sync = Backbone.sync;
@@ -86,7 +130,7 @@
             options.url = _.result(model, 'url');
         }
 
-        var context = initializeXHRLoading(method, model, model, options);
+        var context = initializeXHRLoading(method, model, options);
         if (context._defaultPrevented) {
             // it is assumed that either context.options.success or context.options.error will be called
             return;
@@ -137,46 +181,57 @@
     };
 
     // forward all or some XHR events from the source object to the dest object
-    // FIXME remove humpback case names after next minor release
-    Backbone.forwardXhrEvents = Backbone.forwardXHREvents = function(source, dest, typeOrCallback) {
-        var handler = handleForwardedEvents(!_.isFunction(typeOrCallback) && typeOrCallback);
+    Backbone.forwardXHREvents = function(sourceModel, destModel, typeOrCallback) {
+        var handler = handleForwardedEvents(!_.isFunction(typeOrCallback) && typeOrCallback, sourceModel, destModel);
         if (_.isFunction(typeOrCallback)) {
             // forward the events *only* while the function is executing wile keeping "this" as the context
             try {
-                source.on(xhrEventName, handler, dest);
+                sourceModel.on(xhrEventName, handler, destModel);
                 typeOrCallback.call(this);
             } finally {
-                source.off(xhrEventName, handler, dest);
+                sourceModel.off(xhrEventName, handler, destModel);
             }
         } else {
             var eventName = typeOrCallback ? (xhrEventName + ':') + typeOrCallback : xhrEventName;
-            source.on(eventName, handler, dest);
+            sourceModel.on(eventName, handler, destModel);
         }
     };
 
-    // FIXME remove humpback case names after next minor release
-    Backbone.stopXhrForwarding = Backbone.stopXHRForwarding = function(source, dest, type) {
-        var handler = handleForwardedEvents(type);
-        source.off(xhrEventName, handler, dest);
+    // stop the XHR forwarding
+    Backbone.stopXHRForwarding = function(sourceModel, destModel, type) {
+        type = type || '_all';
+        var eventForwarders = getEventForwardingCache(sourceModel, destModel),
+            handler = eventForwarders[type];
+        if (handler) {
+            sourceModel.off(xhrEventName, handler, destModel);
+        }
     };
 
-    var _eventForwarders = {};
+    function getEventForwardingCache(sourceModel, destModel) {
+        var eventForwarders = sourceModel._eventForwarders = (sourceModel._eventForwarders || {});
+        if (!eventForwarders[destModel]) {
+            eventForwarders[destModel] = {};
+        }
+        return eventForwarders[destModel];
+    }
 
-    function handleForwardedEvents(type) {
+    function handleForwardedEvents(type, sourceModel, destModel) {
+        var eventForwarders = getEventForwardingCache(sourceModel, destModel);
+
         type = type || '_all';
-        var func = _eventForwarders[type];
+        var func = eventForwarders[type];
         if (!func) {
             // cache it so we can unbind when we need to
-            func = function(eventName, events) {
+            func = function(eventName, sourceContext) {
                 if (type !== '_all') {
                     // if the event is already scoped, the event type will not be provided as the first parameter
-                    events = eventName;
+                    sourceContext = eventName;
                     eventName = type;
                 }
-                // these events will be called because we are using the same options object as the source call
-                initializeXHRLoading(events.method, this, events.model, events.options);
+                var forwardTo = sourceContext._forwardTo = (sourceContext._forwardTo || []);
+                forwardTo.push(initializeXHRLoading(eventName, destModel, sourceContext.options, true));
             };
-            _eventForwarders[type] = func;
+            eventForwarders[type] = func;
         }
         return func;
     }
@@ -185,93 +240,111 @@
     // "model" is to trigger events on and "sourceModel" is the model to provide to the success/error callbacks
     // these are the same unless there is event forwarding in which case the "sourceModel" is the model that actually
     // triggered the events and "model" is just forwarding those events
-    function initializeXHRLoading(method, model, sourceModel, options) {
-        var loads = model[xhrLoadingAttribute] = model[xhrLoadingAttribute] || [],
-            eventName = options && options.event || method,
-            context = new Context(method, sourceModel, options);
+    function initializeXHRLoading(method, model, options, forwarding) {
+        var eventName = options && options.event || method,
+            context = new Context(method, model, options),
+            scopedEventName = xhrEventName + ':' + eventName,
+            finished;
 
-        var scopedEventName = xhrEventName + ':' + eventName;
-        model.trigger(xhrEventName, eventName, context);
-        model.trigger(scopedEventName, context);
-        if (model === sourceModel) {
-            // don't call global events if this is XHR forwarding
-            globalXhrBus.trigger(xhrEventName, eventName, model, context);
-            globalXhrBus.trigger(scopedEventName, model, context);
-        }
-
-        // allow for 1 last override
-        var _beforeSend = options.beforeSend;
-        options.beforeSend = function(xhr, settings) {
-            context.xhr = xhr;
-            context.settings = settings;
-
-            if (_beforeSend) {
-                var rtn = _beforeSend.call(this, xhr, settings);
-                if (rtn === false) {
-                    return rtn;
-                }
-            }
-            context.trigger('before-send', xhr, settings, context);
-            if (context._defaultPrevented) {
-                return false;
-            }
-            loads.push(context);
+        // at this point, all we can do is call the complete event
+        var origCallbacks = {
+            success: options.success,
+            error: options.error
         };
 
-        function onComplete(type) {
-            var _type = options[type];
-            // success: (data, status, xhr);  error: (xhr, type, error)
-            options[type] = function(p1, p2, p3) {
-                var self = this;
-                var _contextArgs = context.args = [p1, p2, p3];
-                context.finish = finish;
+        function finish(type) {
+            if (!forwarding && !finished) {
+                finished = true;
+                context.removeLoadEntry();
+                type = type || 'halt';
 
-                function finish(_options) {
-                    // options callback
+                // trigger the complete event
+                context.triggerAll('complete', type);
+            }
+        }
+        // allow complete callbacks to be executed from the stopPropogation response
+        context._handler.complete = finish;
+
+        function wrapCallback(type) {
+
+            function triggerEvents() {
+                if (!finished) {
+
                     try {
-                        if (_type && (!_options || !_options.preventCallbacks)) {
-                            _type.apply(self, context.args);
+                        var args = Array.prototype.slice.call(arguments, 0, 3);
+
+                        // options callback
+                        var typeCallback = origCallbacks[type];
+                        if (typeCallback) {
+                            typeCallback.apply(context, args);
                         }
+
+                        // trigger the success/error event
+                        args.splice(0, 0, type);
+                        args.push(context);
+                        context.triggerAll.apply(context, args);
+
                     } finally {
-                        // remove the load entry
-                        var index = loads.indexOf(context);
-                        if (index >= 0) {
-                            loads.splice(index, 1);
-                        }
-
-                        // if there are no more cuncurrent XHRs, model[xhrLoadingAttribute] should always be undefind
-                        if (loads.length === 0) {
-                            model[xhrLoadingAttribute] = undefined;
-                            model.trigger(xhrCompleteEventName, context);
-                        }
-                    }
-
-                    // trigger the success/error event
-                    var args = (type === SUCCESS) ? [type, context] : [type, _contextArgs[0], _contextArgs[1], _contextArgs[2], context];
-                    context.trigger.apply(context, args);
-
-                    // trigger the complete event
-                    if (!_options || !_options.preventEvents) {
-                        args.splice(0, 0, 'complete');
-                        context.trigger.apply(context, args);
+                        finish(type);
                     }
                 }
+            }
+            // allow success/error callbacks to be executed from the stopPropogation response
+            context._handler[type] = triggerEvents;
 
-                if (type === SUCCESS && !context._defaultPrevented) {
-                    // trigger the "data" event which allows manipulation of the response before any other events or callbacks are fired
-                    context.trigger('after-send', p1, p2, p3, type, context);
-                    _contextArgs[0] = context.data || _contextArgs[0];
+            // success: (data, status, xhr);  error: (xhr, type, error)
+            options[type] = function(p1, p2, p3) {
+
+                if (!context._defaultPrevented) {
+                    context.triggerAll('after-send', p1, p2, p3, type);
+
                     // if context.preventDefault is true, it is assumed that the option success or callback will be manually called
                     if (context._defaultPrevented) {
                         return;
+                    } else if (context.data) {
+                        p1 = context.data || p1;
                     }
+
+                    triggerEvents(p1, p2, p3);
                 }
-                context.finish();
             };
         }
 
-        onComplete(SUCCESS);
-        onComplete(ERROR);
+        if (!forwarding) {
+            // wrap the orig callbacks
+            wrapCallback(SUCCESS);
+            wrapCallback(ERROR);
+        }
+
+        // trigger the model xhr events
+        model.trigger(xhrEventName, eventName, context);
+        model.trigger(scopedEventName, context);
+
+        if (!forwarding) {
+
+            // don't call global events if this is XHR forwarding
+            globalXhrBus.trigger(xhrEventName, eventName, model, context);
+            globalXhrBus.trigger(scopedEventName, model, context);
+
+            // allow for 1 last override
+            var _beforeSend = options.beforeSend;
+            options.beforeSend = function(xhr, settings) {
+                context.xhr = xhr;
+                context.settings = settings;
+
+                if (_beforeSend) {
+                    var rtn = _beforeSend.call(this, xhr, settings);
+                    if (rtn === false) {
+                        return rtn;
+                    }
+                }
+                context.triggerAll('before-send', xhr, settings);
+                if (context._defaultPrevented) {
+                    return false;
+                }
+                context.pushLoadActivity();
+            };
+        }
 
         return context;
     }

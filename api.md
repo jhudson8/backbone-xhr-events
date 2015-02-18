@@ -53,13 +53,15 @@ Override the XHR payload or cache it
 ```
     Backbone.xhrEvents.on('xhr', function(method, model, context) {
       context.on('after-send', function(data, status, xhr, responseType, context) {
-        if (responseType === 'success') {
-          // wrap the response as a "response" attribute
+
+        // responseType will either be 'success' or 'error'
+        if (method === 'read' && responseType === 'success') {
+
+          // wrap the response as a "response" attribute (just to show how to modify it)
           context.data = { response: data };
+
           // cache the response
-          if (method === 'read') {
-            _cacheFetchResponse(JSON.stringify(data), context.options.url);
-          }
+          _cacheFetchResponse(JSON.stringify(data), context.options.url);
         }
       });
     });
@@ -72,8 +74,7 @@ Intercept a request and return a cached payload
       if (context.method === 'read') {
         var cachedResult = _getFetchCache(context.options.url);
         if (cachedResult) {
-          context.preventDefault();
-          options.success(JSON.parse(cachedResult), 'success');
+          context.preventDefault().success(JSON.parse(cachedResult), 'success', undefined);
         }
       }
     });
@@ -84,14 +85,10 @@ Make a successful XHR look like a failure
 ```
     model.on('xhr', function(method, context) {
       context.on('after-send', function(data, status, xhr, responseType) {
-        context.preventDefault();
-        context.finish({
-          // indicate that the xhr callbacks will be handled manually
-          preventCallbacks: true
-        });
-
-        // provide the parameters that you would have wanted coming back directly from the $.ajax callback
-        context.options.error(...);
+        if (responseType === 'success') {
+          // provide the parameters that you would have wanted coming back directly from the $.ajax callback
+          context.preventDefault().error(...)
+        }
       });
     });
 ```
@@ -101,10 +98,9 @@ Alter the payload asynchronously after the initial response is returned
 ```
     Backbone.xhrEvents.on('xhr', function(method, model, context) {
       context.on('after-send', function(data, status, xhr, responseType) {
-        context.preventDefault();
+        var handler = context.preventDefault();
         yourOwnGetDataAsyncMethod(function(data) {
-          context.data = data;
-          context.finish();
+          handler.success(data, status, xhr);
         });
       });
     });
@@ -115,8 +111,10 @@ Add simulated 1 second latency
 ```
     Backbone.xhrEvents.on('xhr', function(method, model, context) {
       context.on('after-send', function(data, status, xhr, responseType) {
-        context.preventDefault();
-        setTimeout(context.finish, 1000);
+        var handler = context.preventDefault();
+        setTimeout(function() {
+          handler.success(data, status, xhr);
+        }, 1000);
       });
     });
 ```
@@ -267,9 +265,8 @@ Emitted when any XHR activity occurs
       // method is "read", "save", or "delete" or custom (Backbone.sync method)
       // context is a Backbone.Events to bind to XHR lifecycle events
 
-      context.on('complete', function(type, {type specific args}) {
-        // type will either be "success" or "error" and the type specific args are the same as what is provided to the respective events
-        // this will be called when the XHR succeeds or fails
+      context.on('complete', function(type) {
+        // type will either be "success" or "error" and will be called when the XHR succeeds or fails
       });
       context.on('success', function(model) {
         // this will be called after the XHR succeeds

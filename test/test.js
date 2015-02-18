@@ -1,4 +1,4 @@
-/*global it, describe, beforeEach, afterEach */
+/*global it, require, describe, beforeEach, afterEach */
 
 var chai = require('chai'),
   sinon = require('sinon'),
@@ -23,8 +23,8 @@ var chai = require('chai'),
     success: function () {
       if (this.options.length) {
         var _options = this.options.splice(0, 1)[0];
-        if (_options.xhr.abort.callCount == 0) {
-          _options.success.apply(this, arguments)
+        if (_options.xhr.abort.callCount === 0) {
+          _options.success.apply(this, arguments);
         }
       } else {
         throw new Error('no available options');
@@ -46,8 +46,7 @@ describe("backbone-xhr-events", function () {
       url: 'foo'
     }),
     clock,
-    model,
-    event;
+    model;
 
   beforeEach(function () {
     model = new XhrModel();
@@ -68,14 +67,18 @@ describe("backbone-xhr-events", function () {
           var options = context.options;
           // see if any current XHR activity matches this request
           var match = _.find(model.xhrActivity, function(_context) {
-            return options.url === _context.options.url
-                && method === _context.method
-                && _.isEqual(settings.data, _context.settings.data);
+            return options.url === _context.options.url &&
+              method === _context.method &&
+              _.isEqual(settings.data, _context.settings.data);
           });
           if (match) {
-            match.on('after-send', context.options.success);
-            match.on('error', context.options.error);
-            context.preventDefault();
+            var handler = context.preventDefault();
+            match.on('success', function() {
+              handler.success.apply(handler, arguments);
+            });
+            match.on('error', function() {
+              handler.error.apply(handler, arguments);
+            });
           }
         });
       }
@@ -85,7 +88,7 @@ describe("backbone-xhr-events", function () {
         sinon.spy(Backbone.Model.prototype, 'parse');
         model.url = function() {
           return 'foo/' + this.attributes.a;
-        }
+        };
         Backbone.xhrEvents.on('xhr', onXhr);
       });
       afterEach(function() {
@@ -186,9 +189,9 @@ describe("backbone-xhr-events", function () {
     it("should initiate a fetch if not already fetched", function () {
       var spy = sinon.spy(),
           onFetch = sinon.spy();
-      model.on('xhr:read', onFetch)
+      model.on('xhr:read', onFetch);
       model.whenFetched(spy);
-      expect(onFetch).to.have.been.called;
+      expect(onFetch.callCount).to.eql(1);
       $.success({});
       expect(spy).to.have.been.calledWith(model);
     });
@@ -197,16 +200,16 @@ describe("backbone-xhr-events", function () {
           errorSpy = sinon.spy();
       model.whenFetched(successSpy, errorSpy);
       $.error({});
-      expect(errorSpy).to.have.been.called;
-      expect(successSpy).to.not.have.been.called;
+      expect(errorSpy.callCount).to.eql(1);
+      expect(successSpy.callCount).to.eql(0);
     });
     it("should connect to an ongoing fetch and not initiate a new one", function () {
       var spy = sinon.spy(),
           onFetch = sinon.spy();
       model.fetch();
-      model.on('xhr:read', onFetch)
+      model.on('xhr:read', onFetch);
       model.whenFetched(spy);
-      expect(onFetch).to.not.have.been.called;
+      expect(onFetch.callCount).to.eql(0);
       $.success({});
       expect(spy).to.have.been.calledWith(model);
     });
@@ -216,8 +219,8 @@ describe("backbone-xhr-events", function () {
       model.fetch();
       model.whenFetched(successSpy, errorSpy);
       $.error({});
-      expect(errorSpy).to.have.been.called;
-      expect(successSpy).to.not.have.been.called;
+      expect(errorSpy.callCount).to.eql(1);
+      expect(successSpy.callCount).to.eql(0);
     });
   });
 
@@ -285,11 +288,10 @@ describe("backbone-xhr-events", function () {
       model.fetch(options);
       $.success({});
       expect(success.callCount).to.eql(1);
-      expect(success.getCall(0).args[0].options.foo).to.eql('bar');
+      expect(success.getCall(0).args[3].options.foo).to.eql('bar');
       expect(error.callCount).to.eql(0);
       expect(complete.callCount).to.eql(1);
       expect(complete.getCall(0).args[0]).to.eql('success');
-      expect(complete.getCall(0).args[1].options.foo).to.eql('bar');
     });
 
     it("provide correct error event parameters", function () {
@@ -314,10 +316,6 @@ describe("backbone-xhr-events", function () {
       expect(success.callCount).to.eql(0);
       expect(complete.callCount).to.eql(1);
       expect(complete.getCall(0).args[0]).to.eql('error');
-      expect(complete.getCall(0).args[1]).to.eql('xhr');
-      expect(complete.getCall(0).args[2]).to.eql('errorType');
-      expect(complete.getCall(0).args[3]).to.eql('thrownError');
-      expect(complete.getCall(0).args[4].options.foo).to.eql('bar');
     });
 
     it("use loading to return true if there is any current xhr activity", function () {
@@ -363,16 +361,12 @@ describe("backbone-xhr-events", function () {
     });
 
     it("should allow 'context.finish' to be called from the 'after-send' event handler", function () {
-      var count = 0,
-        origResponseData,
-        successId,
-        dataId,
-        successSpy = sinon.spy(),
+      var successSpy = sinon.spy(),
         afterSendSpy = function (data, status, xhr, responseType, context) {
+          var handler = context.preventDefault();
           setTimeout(function() {
-            context.finish();
+            handler.success(data, status, xhr);
           }, 1);
-          context.preventDefault();
         },
         eventSpy = sinon.spy(function (type, events) {
           events.on('success', successSpy);
@@ -464,7 +458,7 @@ describe("backbone-xhr-events", function () {
   describe("XHR forwarding", function () {
     it('should forward events and handle fetch success conditions appropriately', function () {
       var successModel,
-        successSpy = sinon.spy(function (context) {
+        successSpy = sinon.spy(function (data, status, xhr, context) {
           successModel = context.model;
         }),
         eventSpy = sinon.spy(function (events) {
@@ -472,8 +466,8 @@ describe("backbone-xhr-events", function () {
         }),
         sourceCompleteSpy = sinon.spy(),
         receiverCompleteSpy = sinon.spy(),
-        source = new XhrModel(),
-        receiver = new Backbone.Model();
+        source = new XhrModel({test: 'a'}),
+        receiver = new Backbone.Model({test: 'b'});
 
       Backbone.forwardXHREvents(source, receiver);
       receiver.on('xhr:read', eventSpy);
@@ -526,8 +520,6 @@ describe("backbone-xhr-events", function () {
         eventSpy = sinon.spy(function (type, events) {
           events.on('success', successSpy);
         }),
-        sourceCompleteSpy = sinon.spy(),
-        receiverCompleteSpy = sinon.spy(),
         source = new XhrModel(),
         receiver = new Backbone.Model();
 
@@ -545,7 +537,7 @@ describe("backbone-xhr-events", function () {
       expect(successSpy.callCount).to.eql(1);
     });
 
-    it('should work with single use callbak function', function () {
+    it('should work with single use callback function', function () {
       var successModel,
         successSpy = sinon.spy(function (model) {
           successModel = model;
@@ -553,10 +545,12 @@ describe("backbone-xhr-events", function () {
         eventSpy = sinon.spy(function (type, events) {
           events.on('success', successSpy);
         }),
-        sourceCompleteSpy = sinon.spy(),
-        receiverCompleteSpy = sinon.spy(),
-        source = new XhrModel(),
-        receiver = new Backbone.Model();
+        source = new XhrModel({
+          sender: true
+        }),
+        receiver = new Backbone.Model({
+          receiver: true
+        });
 
       receiver.on('xhr', eventSpy);
       Backbone.forwardXHREvents(source, receiver, function () {
