@@ -77,10 +77,15 @@ Intercept a fetch request and return a cached payload
 
 ```
     Backbone.xhrEvents.on('xhr:read', function(context) {
-      var cachedResult = _getFetchCache(context.options.url);
-      if (cachedResult) {
-        context.preventDefault().success(JSON.parse(cachedResult), 'success');
-      }
+
+      // use the "before-send" event (rather than just doing it here) to ensure that options.url exists
+      context.on('before-send', function() {
+
+        var cachedResult = _getFetchCache(context.options.url);
+        if (cachedResult) {
+          context.preventDefault().success(JSON.parse(cachedResult), 'success');
+        }
+      });
     });
 ```
 
@@ -88,8 +93,10 @@ Make a successful XHR look like a failure
 
 ```
     model.on('xhr', function(context) {
+
       context.on('after-send', function(data, status, xhr, responseType) {
         if (responseType === 'success') {
+
           // provide the parameters that you would have wanted coming back directly from the $.ajax callback
           context.preventDefault().error(xhr, 'error', 'Not Found');
         }
@@ -101,8 +108,10 @@ Alter the payload asynchronously after the initial response is returned
 
 ```
     Backbone.xhrEvents.on('xhr', function(context) {
+
       context.on('after-send', function(data, status, xhr) {
         var handler = context.preventDefault();
+
         yourOwnGetDataAsyncMethod(function(data) {
           handler.success(data, status, xhr);
         });
@@ -114,8 +123,10 @@ Add simulated 1 second latency
 
 ```
     Backbone.xhrEvents.on('xhr', function(context) {
+
       context.on('after-send', function(p1, p2, p3, responseType) {
         var handler = context.preventDefault();
+
         setTimeout(function() {
           handler[responseType].(p1, p2, p3);
         }, 1000);

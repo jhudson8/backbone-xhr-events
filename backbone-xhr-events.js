@@ -123,13 +123,7 @@
     // allow backbone to send xhr events on models
     var _sync = Backbone.sync;
     Backbone.sync = function(method, model, options) {
-
         options = options || {};
-        // Ensure that we have a URL.
-        if (!options.url) {
-            options.url = _.result(model, 'url');
-        }
-
         var context = initializeXHRLoading(method, model, options);
         if (context._defaultPrevented) {
             // it is assumed that either context.options.success or context.options.error will be called
