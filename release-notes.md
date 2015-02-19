@@ -2,7 +2,25 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.1...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.2...master)
+
+## v0.11.2 - February 19th, 2015
+- don't eager set options.url (it can be accessed with "before-send" event) - d3de6a8
+
+Compatibility notes:
+This should really be a minor release but I'm not doing one since I just pushed a minor release this morning.  I am no longer forcing options.url to have a value and letting Backbone.sync work naturally.  The only real difference to you is that ```options.url``` is only accessable if you provided ```url``` as an option when making the xhr call (like ```model.fetch({url: '...'})```.
+
+If you want to get the actual URL, you will need to access the ajax settings (what Backbone.sync provides to $.ajax) which you get as a parameter with the ```before-send``` event.  So, to get the URL it would look like this:
+
+```
+    model.on('xhr', function(requestContext) {
+      requestContext.on('before-send', function(xhr, settings) {
+        console.log('the URL is ' + settings.url);
+      });
+    });
+```
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.1...v0.11.2)
 
 ## v0.11.1 - February 19th, 2015
 - bug fix: ensure RequestContext is the first param for xhr & xhr:{method} events - c7499ee
