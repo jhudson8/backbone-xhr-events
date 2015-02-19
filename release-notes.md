@@ -2,7 +2,18 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.10.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.0...master)
+
+## v0.11.0 - February 18th, 2015
+Pretty major changes in this release
+
+* The RequestContext object is now the last parameter on all of the lifecycle methods (where it was the first)
+* preventDefault functionality has been completely overhauled and is very different - see docs for more details but preventDefault is now a method to be called.  The response from this method has 3 methods (success/error/complete) and one of these methods *must* be called to complete the response.
+
+The docs have changed quite a bit for this release so check them out for the updated API and some additional usage examples
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.10.0...v0.11.0)
 
 ## v0.10.0 - February 15th, 2015
 - make preventDefault a function rather than a boolean value to be set on the context
