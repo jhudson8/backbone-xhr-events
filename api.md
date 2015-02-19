@@ -222,12 +222,12 @@ The RequestContext is the object provided as the only parameter with the ```xhr`
     model.on('xhr', function(requestContext) { ... });
 ```
 
-see the [RequestContext events]() and [RequestContext functions and attributes]()
+see the [RequestContext events](#project/jhudson8/backbone-xhr-events/api/Events) and [RequestContext functions and attributes](#project/jhudson8/backbone-xhr-events/package/RequestContext)
 
 
 ### RequestHandler
 
-The RequestHandler is the response from [requestContext.preventDefault()]().  When ```preventDefault``` is called, the request lifecycle is halted.  When this happens, you *must* either call [success](), [error](), or [complete]().
+The RequestHandler is the response from [requestContext.preventDefault()](#project/jhudson8/backbone-xhr-events/method/RequestContext/preventDefault).  When ```preventDefault``` is called, the request lifecycle is halted.  When this happens, you *must* either call [success](#project/jhudson8/backbone-xhr-events/method/RequestHandler/success), [error](#project/jhudson8/backbone-xhr-events/method/RequestHandler/error), or [complete](l#project/jhudson8/backbone-xhr-events/method/RequestHandler/complete).
 
 
 
@@ -331,7 +331,7 @@ Triggered after the error callback handler has executed.  This can be used to pe
 #### "xhr" (mehod, requestContext)
 
 * ***method***: the Backbone.sync method (by default, ```read```, ```update```, or ```delete```)
-* ***requestContext***: the [request context](#section/Request%20Context)
+* ***requestContext***: the [RequestContext](#section/Request%20Context)
 
 This event is triggered on any model or collection when *any* XHR activity is initiated from that model / collection.  It is also triggered on ```Backbone.xhrEvents``` when XHR activity is initiated from *any* model / collection.
 
@@ -376,7 +376,7 @@ or, to watch XHR activity from *any* model or collection
 
 #### "xhr:complete" (requestContext)
 
-* ***context***: the context representing the *last* XHR activity (see [RequestContext](#section/Request%20Context))
+* ***context***: the context representing the *last* XHR activity (see [RequestContext](#project/jhudson8/backbone-xhr-events/section/RequestContext))
 
 Triggered on a model or collection (not Backbone.xhrActivity) when any XHR activity has completed *and* there is no more concurrent XHR activity
 
@@ -392,7 +392,7 @@ The RequestContext is the object provided as the only parameter with the ```xhr`
     model.on('xhr', function(requestContext) { ... });
 ```
 
-see the [RequestContext events]() and [RequestContext functions and attributes]()
+also refer to the [RequestContext events](#project/jhudson8/backbone-xhr-events/package/RequestContext%20events)
 
 
 #### preventDefault ()
@@ -462,7 +462,7 @@ The [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpReq
 
 ### RequestHandler
 
-The RequestHandler is the response from [requestContext.preventDefault()]().  When ```preventDefault``` is called, the request lifecycle is halted.  When this happens, you *must* either call [success](), [error](), or [complete]().
+The RequestHandler is the response from [requestContext.preventDefault()](#project/jhudson8/backbone-xhr-events/method/RequestContext/preventDefault).  When ```preventDefault``` is called, the request lifecycle is halted.  When this happens, you *must* either call [success](#project/jhudson8/backbone-xhr-events/method/RequestHandler/success), [error](#project/jhudson8/backbone-xhr-events/method/RequestHandler/error), or [complete](#project/jhudson8/backbone-xhr-events/method/RequestHandler/complete).
 
 #### success (data, status, xhr)
 
@@ -470,7 +470,7 @@ The RequestHandler is the response from [requestContext.preventDefault()]().  Wh
 * ***status***: the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) text status
 * ***xhr***: the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)
 
-Initiate a success response if the [preventDefault]() method was called.
+Initiate a success response if the [preventDefault](#project/jhudson8/backbone-xhr-events/method/RequestContext/preventDefault) method was called.
 
 ```
     model.on('xhr', function(requestContext) {
@@ -485,7 +485,7 @@ Initiate a success response if the [preventDefault]() method was called.
 * ***status***: the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) text status
 * ***error***: the error thrown
 
-Initiate an error response if the [preventDefault]() method was called.
+Initiate an error response if the [preventDefault](#project/jhudson8/backbone-xhr-events/method/RequestContext/preventDefault) method was called.
 
 ```
     model.on('xhr', function(requestContext) {
@@ -496,7 +496,7 @@ Initiate an error response if the [preventDefault]() method was called.
 
 #### complete (type)
 
-* ***type***: the completion type; normally ```success``` or ```error``` but can technically be anything.  This will be the value passed to the ```complete``` event triggered from the [RequestContext]().
+* ***type***: the completion type; normally ```success``` or ```error``` but can technically be anything.  This will be the value passed to the ```complete``` event triggered from the [RequestContext](#project/jhudson8/backbone-xhr-events/section/RequestContext).
 
 Using this method will bypass any success / error handlers bound to the XHR request but any completion handlers will still be executed.
 
