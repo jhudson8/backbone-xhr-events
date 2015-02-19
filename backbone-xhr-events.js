@@ -141,12 +141,13 @@
     };
 
     // provide helper flags to determine model fetched status
-    globalXhrBus.on(xhrEventName + ':read', function(model, events) {
-        events.on(SUCCESS, function() {
+    globalXhrBus.on(xhrEventName + ':read', function(context) {
+        var model = context.model;
+        context.on(SUCCESS, function() {
             model.hasBeenFetched = true;
             model.hadFetchError = false;
         });
-        events.on(ERROR, function() {
+        context.on(ERROR, function() {
             model.hadFetchError = true;
         });
     });
@@ -234,14 +235,9 @@
         var func = eventForwarders[type];
         if (!func) {
             // cache it so we can unbind when we need to
-            func = function(eventName, sourceContext) {
-                if (type !== '_all') {
-                    // if the event is already scoped, the event type will not be provided as the first parameter
-                    sourceContext = eventName;
-                    eventName = type;
-                }
+            func = function(sourceContext) {
                 var forwardTo = sourceContext._forwardTo = (sourceContext._forwardTo || []);
-                forwardTo.push(initializeXHRLoading(eventName, destModel, sourceContext.options, true));
+                forwardTo.push(initializeXHRLoading(sourceContext.method, destModel, sourceContext.options || {}, true));
             };
             eventForwarders[type] = func;
         }
@@ -253,7 +249,7 @@
     // these are the same unless there is event forwarding in which case the "sourceModel" is the model that actually
     // triggered the events and "model" is just forwarding those events
     function initializeXHRLoading(method, model, options, forwarding) {
-        var eventName = options && options.event || method,
+        var eventName = options.event || method,
             context = new Context(method, model, options),
             scopedEventName = xhrEventName + ':' + eventName,
             finished;
@@ -329,14 +325,14 @@
         }
 
         // trigger the model xhr events
-        model.trigger(xhrEventName, eventName, context);
+        model.trigger(xhrEventName, context, eventName);
         model.trigger(scopedEventName, context);
 
         if (!forwarding) {
 
             // don't call global events if this is XHR forwarding
-            globalXhrBus.trigger(xhrEventName, eventName, model, context);
-            globalXhrBus.trigger(scopedEventName, model, context);
+            globalXhrBus.trigger(xhrEventName, context, eventName);
+            globalXhrBus.trigger(scopedEventName, context);
 
             // allow for 1 last override
             var _beforeSend = options.beforeSend;

@@ -44,24 +44,24 @@ Sections
 --------
 ### General Usage Examples
 
-Bind to a model to listen to only fetches
+Listen to all XHR activity
 
 ```
-    model.on('xhr:read', function(context) {
+    Backbone.xhrEvents.on('xhr', function(context) {
       context.on('success', function() {
         // context.model has been updated
       });
     });
 ```
 
-Override the XHR payload or cache it
+Override fetch XHR payload or cache it
 
 ```
-    Backbone.xhrEvents.on('xhr', function(context) {
+    Backbone.xhrEvents.on('xhr:read', function(context) {
       context.on('after-send', function(data, status, xhr, responseType) {
 
         // responseType will either be 'success' or 'error'
-        if (method === 'read' && responseType === 'success') {
+        if (responseType === 'success') {
 
           // wrap the response as a "response" attribute (just to show how to modify it)
           context.data = { response: data };
@@ -73,15 +73,13 @@ Override the XHR payload or cache it
     });
 ```
 
-Intercept a request and return a cached payload
+Intercept a fetch request and return a cached payload
 
 ```
-    Backbone.xhrEvents.on('xhr', function(context) {
-      if (context.method === 'read') {
-        var cachedResult = _getFetchCache(context.options.url);
-        if (cachedResult) {
-          context.preventDefault().success(JSON.parse(cachedResult), 'success');
-        }
+    Backbone.xhrEvents.on('xhr:read', function(context) {
+      var cachedResult = _getFetchCache(context.options.url);
+      if (cachedResult) {
+        context.preventDefault().success(JSON.parse(cachedResult), 'success');
       }
     });
 ```
@@ -330,7 +328,7 @@ Triggered after the error callback handler has executed.  This can be used to pe
 
 ### Backbone.Model, Backbone.Collection & Backbone.xhrEvents
 
-#### "xhr" (mehod, requestContext)
+#### "xhr" (requestContext, method)
 
 * ***method***: the Backbone.sync method (by default, ```read```, ```update```, or ```delete```)
 * ***requestContext***: the [RequestContext](#section/Request%20Context)
@@ -338,7 +336,9 @@ Triggered after the error callback handler has executed.  This can be used to pe
 This event is triggered on any model or collection when *any* XHR activity is initiated from that model / collection.  It is also triggered on ```Backbone.xhrEvents``` when XHR activity is initiated from *any* model / collection.
 
 ```
-    model.on('xhr', function(method, requestContext) {
+    model.on('xhr', function(requestContext, method) {
+      // the method is also available as requestContext.method
+
       // for any fetch operations
       if (method === 'read') {
         ...
@@ -349,7 +349,7 @@ This event is triggered on any model or collection when *any* XHR activity is in
 or, to watch XHR activity from *any* model or collection
 
 ```
-    Backbone.xhrEvents.on('xhr', function(method, requestContext) {
+    Backbone.xhrEvents.on('xhr', function(requestContext, method) {
       var theModel = requestContext.model;
       ...
     });
@@ -363,7 +363,7 @@ or, to watch XHR activity from *any* model or collection
 Emitted when only XHR activity matching the method in the event name occurs
 
 ```
-    model.on('xhr:read', function(method, context) {
+    model.on('xhr:read', function(requestContext) {
       // this is only triggered on model.fetch()
     });
 ```
@@ -526,6 +526,30 @@ Initiate a fetch if not already fetching or fetched.  Once the model/collection 
         // executed if the model fetch fails
       }
     );
+```
+
+#### xhrActivity
+
+This is a Model or Collection attribute that can be evaluated as a truthy if there is any current XHR activity.
+
+```
+    var isCurrentXhrActivity = !!model.xhrActivity;
+```
+
+#### hasBeenFetched
+
+This will be true if the Model or Collection has previously been fetched with a sucessful response.  If the Model or Collection is cleared, this value will be reset to undefined.
+
+```
+    var isTheModelPopulated = model.hasBeenFetched;
+```
+
+#### hadFetchError
+
+This will be true if the Model or Collection encountered an XHR error when performing a fetch.  It will reset to false upon a successful fetch operation.
+
+```
+    var wasThereAFetchError = model.hadFetchError;
 ```
 
 

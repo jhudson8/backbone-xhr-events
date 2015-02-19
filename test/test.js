@@ -62,7 +62,7 @@ describe("backbone-xhr-events", function () {
   describe("examples", function () {
     describe('Prevent duplicate concurrent submission of any XHR request', function() {
 
-      function onXhr(method, model, context) {
+      function onXhr(context, method) {
         context.on('before-send', function(xhr, settings) {
           var options = context.options;
           // see if any current XHR activity matches this request
@@ -231,14 +231,14 @@ describe("backbone-xhr-events", function () {
       model.fetch();
 
       expect(spy.callCount).to.eql(1);
-      expect(spy.getCall(0).args[0]).to.eql('read');
+      expect(spy.getCall(0).args[1]).to.eql('read');
       model.set({
         id: 1
       });
       model.destroy();
-      expect(spy.getCall(1).args[0]).to.eql('delete');
+      expect(spy.getCall(1).args[1]).to.eql('delete');
       model.save();
-      expect(spy.getCall(2).args[0]).to.eql('update');
+      expect(spy.getCall(2).args[1]).to.eql('update');
     });
 
     it("trigger specific xhr event", function () {
@@ -345,9 +345,9 @@ describe("backbone-xhr-events", function () {
             abc: "def"
           };
         },
-        eventSpy = sinon.spy(function (type, events) {
-          events.on('success', successSpy);
-          events.on('after-send', afterSendSpy);
+        eventSpy = sinon.spy(function (context) {
+          context.on('success', successSpy);
+          context.on('after-send', afterSendSpy);
         });
 
       model.on('xhr', eventSpy);
@@ -368,9 +368,9 @@ describe("backbone-xhr-events", function () {
             handler.success(data, status, xhr);
           }, 1);
         },
-        eventSpy = sinon.spy(function (type, events) {
-          events.on('success', successSpy);
-          events.on('after-send', afterSendSpy);
+        eventSpy = sinon.spy(function (context) {
+          context.on('success', successSpy);
+          context.on('after-send', afterSendSpy);
         });
 
       model.on('xhr', eventSpy);
@@ -412,16 +412,14 @@ describe("backbone-xhr-events", function () {
       });
       expect(eventSpy.callCount).to.eql(1);
       var args = eventSpy.getCall(0).args;
-      expect(args[0]).to.eql(model);
-      expect(!!args[1].trigger).to.eql(true);
-      expect(args[1].options.foo).to.eql('bar');
+      expect(!!args[0].trigger).to.eql(true);
+      expect(args[0].options.foo).to.eql('bar');
 
       expect(allEventsSpy.callCount).to.eql(1);
       args = allEventsSpy.getCall(0).args;
-      expect(args[0]).to.eql('read');
-      expect(args[1]).to.eql(model);
-      expect(!!args[2].trigger).to.eql(true);
-      expect(args[2].options.foo).to.eql('bar');
+      expect(!!args[0].trigger).to.eql(true);
+      expect(args[0].options.foo).to.eql('bar');
+      expect(args[1]).to.eql('read');
     });
   });
 
@@ -518,8 +516,8 @@ describe("backbone-xhr-events", function () {
         successSpy = sinon.spy(function (model) {
           successModel = model;
         }),
-        eventSpy = sinon.spy(function (type, events) {
-          events.on('success', successSpy);
+        eventSpy = sinon.spy(function (context) {
+          context.on('success', successSpy);
         }),
         source = new XhrModel(),
         receiver = new Backbone.Model();
@@ -543,8 +541,8 @@ describe("backbone-xhr-events", function () {
         successSpy = sinon.spy(function (model) {
           successModel = model;
         }),
-        eventSpy = sinon.spy(function (type, events) {
-          events.on('success', successSpy);
+        eventSpy = sinon.spy(function (context) {
+          context.on('success', successSpy);
         }),
         source = new XhrModel({
           sender: true
