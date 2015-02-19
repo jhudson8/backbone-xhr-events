@@ -340,6 +340,19 @@ Triggered after the error callback handler has executed.  This can be used to pe
     });
 ```
 
+#### "abort" ()
+
+Executed when the XHR is aborted using [RequestContext.abort](#project/jhudson8/backbone-xhr-events/method/RequestContext/abort)
+
+```javascript
+    model.on('xhr', function(requestContext) {
+      requestContext.on('abort', function() {
+        // if we wanted to prevent the error callback when we abort
+        requestContext.preventDefault().complete('abort');
+      });
+    });
+```
+
 
 ### Backbone.Model, Backbone.Collection & Backbone.xhrEvents
 

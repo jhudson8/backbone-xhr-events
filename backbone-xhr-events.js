@@ -68,10 +68,10 @@
             if (!this.aborted) {
                 this.aborted = true;
                 this.type = 'abort';
+                this.triggerAll('abort');
                 if (this.xhr) {
                     this.xhr.abort();
                 }
-                this.triggerAll('abort');
             }
         },
 
