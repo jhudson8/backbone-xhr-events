@@ -46,7 +46,7 @@ Sections
 
 Listen to all XHR activity
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr', function(context) {
       context.on('success', function() {
         // context.model has been updated
@@ -56,7 +56,7 @@ Listen to all XHR activity
 
 Override fetch XHR payload or cache it
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr:read', function(context) {
       context.on('after-send', function(data, status, xhr, responseType) {
 
@@ -75,7 +75,7 @@ Override fetch XHR payload or cache it
 
 Intercept a fetch request and return a cached payload
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr:read', function(context) {
 
       // use the "before-send" event (rather than just doing it here) to ensure that options.url exists
@@ -91,7 +91,7 @@ Intercept a fetch request and return a cached payload
 
 Make a successful XHR look like a failure
 
-```
+```javascript
     model.on('xhr', function(context) {
 
       context.on('after-send', function(data, status, xhr, responseType) {
@@ -106,7 +106,7 @@ Make a successful XHR look like a failure
 
 Alter the payload asynchronously after the initial response is returned
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr', function(context) {
 
       context.on('after-send', function(data, status, xhr) {
@@ -121,7 +121,7 @@ Alter the payload asynchronously after the initial response is returned
 
 Add simulated 1 second latency
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr', function(context) {
 
       context.on('after-send', function(p1, p2, p3, responseType) {
@@ -137,7 +137,7 @@ Add simulated 1 second latency
 
 Set a default connection timeout on all XHR activity
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr', function(context) {
       context.options.timeout = 3000;
     });
@@ -145,7 +145,7 @@ Set a default connection timeout on all XHR activity
 
 Determine fetch status of a model
 
-```
+```javascript
     model.fetch();
     !!model.xhrActivity === true;
 
@@ -164,15 +164,15 @@ Determine fetch status of a model
 Forward xhr events to another model
 (source model will continue to emit xhr events as well)
 
-```
+```javascript
     // forward all events
     Backbone.forwardXHREvents(sourceModel, receiverModel);
-    // stop forwarding all events
+    // and stop the fowarding
     Backbone.stopXHRForwarding(sourceModel, receiverModel);
 
     // forward events for a specific Backbone.sync method
     Backbone.forwardXHREvents(sourceModel, receiverModel, 'read');
-    // stop forwarding all events
+    // and stop the fowarding
     Backbone.stopXHRForwarding(sourceModel, receiverModel, 'read');
 
     // forward events *only while the callback function is executed*
@@ -184,7 +184,7 @@ Forward xhr events to another model
 
 Prevent duplicate concurrent submission of any XHR request
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr', function(context) {
       context.on('before-send', function(xhr, settings) {
         // we need to use before-send because Backbone.sync creates settings.data
@@ -208,7 +208,7 @@ Prevent duplicate concurrent submission of any XHR request
 
 Prevent the error callback if the request is aborted
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr', function(context) {
       context.on('abort', function() {
         context.preventDefault().complete('abort');
@@ -230,7 +230,7 @@ Almost all event names and model/global attributes can be overridden to suit you
 
 The RequestContext is the object provided as the only parameter with the ```xhr``` events.  It is the context providing the ability to bind to the request lifecycle events.
 
-```
+```javascript
     model.on('xhr', function(requestContext) { ... });
 ```
 
@@ -256,7 +256,7 @@ API: Events
 
 Triggered after Backbone.sync has been executed and an XHR object has been created (but before execution).
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       requestContext.on('before-send', function(xhr, settings, requestContext) {
         ...
@@ -272,7 +272,7 @@ Triggered after Backbone.sync has been executed and an XHR object has been creat
 
 Triggered after the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) has completed and before the Backbone.sync callback has been executed.  This can be used to override the response data or alter the default behavior of the response.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       requestContext.on('after-send', function(p1, p2, p3, responseType, requestContext) {
 
@@ -299,7 +299,7 @@ Triggered after the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/We
 
 Triggered after the success callback handler has executed.  This can be used to perform actions after the model has been updated.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       requestContext.on('success', function(data, status, xhr, requestContext) {
         // the updated mode/collection is requestContext.model
@@ -316,7 +316,7 @@ Triggered after the success callback handler has executed.  This can be used to 
 
 Triggered after the error callback handler has executed.  This can be used to perform actions when an error scenario has occurred.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       requestContext.on('error', function(xhr, status, error, requestContext) {
         ...
@@ -329,7 +329,7 @@ Triggered after the error callback handler has executed.  This can be used to pe
 * ***responseType***: if success ```success```; if error ```error```
 * ***requestContext***: the same object passed to the ```xhr``` event.  It is provided in case the function does not have access to the closure scope.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       requestContext.on('complete', function(type, requestContext) {
         ...
@@ -347,7 +347,7 @@ Triggered after the error callback handler has executed.  This can be used to pe
 
 This event is triggered on any model or collection when *any* XHR activity is initiated from that model / collection.  It is also triggered on ```Backbone.xhrEvents``` when XHR activity is initiated from *any* model / collection.
 
-```
+```javascript
     model.on('xhr', function(requestContext, method) {
       // the method is also available as requestContext.method
 
@@ -360,7 +360,7 @@ This event is triggered on any model or collection when *any* XHR activity is in
 
 or, to watch XHR activity from *any* model or collection
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr', function(requestContext, method) {
       var theModel = requestContext.model;
       ...
@@ -374,7 +374,7 @@ or, to watch XHR activity from *any* model or collection
 
 Emitted when only XHR activity matching the method in the event name occurs
 
-```
+```javascript
     model.on('xhr:read', function(requestContext) {
       // this is only triggered on model.fetch()
     });
@@ -382,7 +382,7 @@ Emitted when only XHR activity matching the method in the event name occurs
 
 or, to watch XHR activity from *any* model or collection
 
-```
+```javascript
     Backbone.xhrEvents.on('xhr:read', function(method, model, context) {
       ...
     });
@@ -402,7 +402,7 @@ API
 
 The RequestContext is the object provided as the only parameter with the ```xhr``` events.  It is the context providing the ability to bind to the request lifecycle events.
 
-```
+```javascript
     model.on('xhr', function(requestContext) { ... });
 ```
 
@@ -415,7 +415,7 @@ Prevent the default execution of the request lifecycle.  A ResponseHandler is re
 
 The following example demonstrates preventing an [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) from being created and simulating a success response.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       var responseHandler = requestContext.stopPropogation();
       setTimeout(function() {
@@ -429,7 +429,7 @@ The following example demonstrates preventing an [XMLHttpRequest](https://develo
 
 Abort the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and trigger the ```abort``` event.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       // if we need to abort for some reason
       requestContext.abort();
@@ -440,7 +440,7 @@ Abort the [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLH
 
 The model or collection that initiated the request
 
-```
+```javascript
     var myModel = ...;
     myModel.on('xhr', function(requestContext) {
       requestContext.model === myModel;
@@ -455,7 +455,7 @@ The Backbone.sync method.  This is either ```read```, ```update```, or ```delete
 
 The options provided to the Backbone.ajax method.
 
-```
+```javascript
   var myModel = ...;
   myModel.on('xhr', function(requestContext) {
     requestContext.options === {foo: 'bar'};
@@ -467,7 +467,7 @@ The options provided to the Backbone.ajax method.
 
 The [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest)
 
-```
+```javascript
   model.on('xhr', function(requestContext) {
     // this is a valid object on or after the "before-send" event
     requestContext.xhr;
@@ -486,7 +486,7 @@ The RequestHandler is the response from [requestContext.preventDefault()](#proje
 
 Initiate a success response if the [preventDefault](#project/jhudson8/backbone-xhr-events/method/RequestContext/preventDefault) method was called.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       var requestHandler = requestContext.preventDefault();
       requestHandler.success({foo: 'bar'}, 'success', undefined);
@@ -501,7 +501,7 @@ Initiate a success response if the [preventDefault](#project/jhudson8/backbone-x
 
 Initiate an error response if the [preventDefault](#project/jhudson8/backbone-xhr-events/method/RequestContext/preventDefault) method was called.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       var requestHandler = requestContext.preventDefault();
       requestHandler.error(undefined, 'error', 'Not Found');
@@ -514,7 +514,7 @@ Initiate an error response if the [preventDefault](#project/jhudson8/backbone-xh
 
 Using this method will bypass any success / error handlers bound to the XHR request but any completion handlers will still be executed.
 
-```
+```javascript
     model.on('xhr', function(requestContext) {
       var requestHandler = requestContext.preventDefault();
       requestHandler.complete('abort');
@@ -530,7 +530,7 @@ Using this method will bypass any success / error handlers bound to the XHR requ
 
 Initiate a fetch if not already fetching or fetched.  Once the model/collection has been fetch, execute the appropriate callback.
 
-```
+```javascript
     myModel.whenFetched(function(model) {
         // executed when model is fetched (model and myModel are the same)
       },
@@ -544,7 +544,7 @@ Initiate a fetch if not already fetching or fetched.  Once the model/collection 
 
 This is a Model or Collection attribute that can be evaluated as a truthy if there is any current XHR activity.
 
-```
+```javascript
     var isCurrentXhrActivity = !!model.xhrActivity;
 ```
 
@@ -552,7 +552,7 @@ This is a Model or Collection attribute that can be evaluated as a truthy if the
 
 This will be true if the Model or Collection has previously been fetched with a sucessful response.  If the Model or Collection is cleared, this value will be reset to undefined.
 
-```
+```javascript
     var isTheModelPopulated = model.hasBeenFetched;
 ```
 
@@ -560,7 +560,7 @@ This will be true if the Model or Collection has previously been fetched with a 
 
 This will be true if the Model or Collection encountered an XHR error when performing a fetch.  It will reset to false upon a successful fetch operation.
 
-```
+```javascript
     var wasThereAFetchError = model.hadFetchError;
 ```
 
@@ -578,7 +578,7 @@ Forward XHR events that originate in ```sourceModel``` to ```destModel```.  Thes
 
 This can be useful if you have a composite model containing sub-models and want to aggregate xhr activity to the composite model.
 
-```
+```javascript
     var CompositeModel = Backbone.Model.extend({
       initialize: function() {
         Backbone.Model.prototype.initialize.apply(this, arguments);
@@ -600,7 +600,6 @@ This can be useful if you have a composite model containing sub-models and want 
 
 Stop forwarding XHR events.  This must match a previous ```forwardXHREvents``` call.
 
-```
+```javascript
     Backbone.forwardXHREvents(sourceModel, destModel, 'read');
 ```
-
