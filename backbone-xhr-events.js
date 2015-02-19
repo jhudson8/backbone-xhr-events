@@ -68,10 +68,10 @@
             if (!this.aborted) {
                 this.aborted = true;
                 this.type = 'abort';
-                this._defaultPrevented = true;
                 if (this.xhr) {
                     this.xhr.abort();
                 }
+                this.triggerAll('abort');
             }
         },
 
@@ -274,7 +274,7 @@
                 context.triggerAll('complete', type);
             }
         }
-        // allow complete callbacks to be executed from the stopPropogation response
+        // allow complete callbacks to be executed from the preventDefault response
         context._handler.complete = finish;
 
         function wrapCallback(type) {
@@ -301,7 +301,7 @@
                     }
                 }
             }
-            // allow success/error callbacks to be executed from the stopPropogation response
+            // allow success/error callbacks to be executed from the preventDefault response
             context._handler[type] = triggerEvents;
 
             // success: (data, status, xhr);  error: (xhr, type, error)
