@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.1...master)
+
+## v0.11.1 - February 19th, 2015
+- bug fix: ensure RequestContext is the first param for xhr & xhr:{method} events - c7499ee
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.0...v0.11.1)
 
 ## v0.11.0 - February 18th, 2015
 Pretty major changes in this release
