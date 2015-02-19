@@ -64,12 +64,11 @@ describe("backbone-xhr-events", function () {
 
       function onXhr(context, method) {
         context.on('before-send', function(xhr, settings) {
-          var options = context.options;
           // see if any current XHR activity matches this request
           var match = _.find(model.xhrActivity, function(_context) {
-            return options.url === _context.options.url &&
+            return settings.url === _context.xhrSettings.url &&
               method === _context.method &&
-              _.isEqual(settings.data, _context.settings.data);
+              _.isEqual(settings.data, _context.xhrSettings.data);
           });
           if (match) {
             var handler = context.preventDefault();

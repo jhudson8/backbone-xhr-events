@@ -67,7 +67,7 @@ Override fetch XHR payload or cache it
           context.data = { response: data };
 
           // cache the response
-          _cacheFetchResponse(JSON.stringify(data), context.options.url);
+          _cacheFetchResponse(JSON.stringify(data), context.xhrSettings.url);
         }
       });
     });
@@ -78,10 +78,11 @@ Intercept a fetch request and return a cached payload
 ```javascript
     Backbone.xhrEvents.on('xhr:read', function(context) {
 
-      // use the "before-send" event (rather than just doing it here) to ensure that options.url exists
-      context.on('before-send', function() {
+      // use the "before-send" event (rather than just doing it here)
+      // so we have access to the XHR settings to get the URL
+      context.on('before-send', function(xhr, settings) {
 
-        var cachedResult = _getFetchCache(context.options.url);
+        var cachedResult = _getFetchCache(settings.url);
         if (cachedResult) {
           context.preventDefault().success(JSON.parse(cachedResult), 'success');
         }
@@ -186,21 +187,23 @@ Prevent duplicate concurrent submission of any XHR request
 
 ```javascript
     Backbone.xhrEvents.on('xhr', function(context) {
+      var model = context.model,
+          method = context.method;
+
       context.on('before-send', function(xhr, settings) {
-        // we need to use before-send because Backbone.sync creates settings.data
 
         // see if any current XHR activity matches this request
         var match = _.find(model.xhrActivity, function(_context) {
-          return context.options.url === _context.options.url
+          return _context.xhrSettings.url === settings.url
               && method === _context.method
-              && _.isEqual(settings.data, _context.settings.data);
+              && _.isEqual(_context.xhrSettings.data, settings.data);
         });
+
         if (match) {
           var handler = context.preventDefault();
           // when the pending request comes back, simulate the same activity on this request
           match.on('success', handler.success);
           match.on('error', handler.error);
-          
         }
       });
     });
@@ -473,6 +476,18 @@ The [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpReq
     requestContext.xhr;
   });
 ```
+
+#### xhrSettings
+
+The [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) settings containing atributes like the request URL.
+
+```javascript
+  model.on('xhr', function(requestContext) {
+    // this is a valid object on or after the "before-send" event
+    var url = requestContext.xhrSettings.url;
+  });
+```
+
 
 ### RequestHandler
 

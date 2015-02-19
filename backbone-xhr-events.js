@@ -332,7 +332,7 @@
             var _beforeSend = options.beforeSend;
             options.beforeSend = function(xhr, settings) {
                 context.xhr = xhr;
-                context.settings = settings;
+                context.xhrSettings = settings;
 
                 if (_beforeSend) {
                     var rtn = _beforeSend.call(this, xhr, settings);
