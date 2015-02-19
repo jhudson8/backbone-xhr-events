@@ -91,7 +91,7 @@ Make a successful XHR look like a failure
       context.on('after-send', function(data, status, xhr, responseType) {
         if (responseType === 'success') {
           // provide the parameters that you would have wanted coming back directly from the $.ajax callback
-          context.preventDefault().error(undefined, 'error', 'Not Found');
+          context.preventDefault().error(xhr, 'error', 'Not Found');
         }
       });
     });
