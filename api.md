@@ -128,7 +128,8 @@ Add simulated 1 second latency
         var handler = context.preventDefault();
 
         setTimeout(function() {
-          handler[responseType] (p1, p2, p3);
+          var successOrErrorMethod = handler[responseType];
+          successOrErrorMethod(p1, p2, p3);
         }, 1000);
       });
     });
