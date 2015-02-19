@@ -48,15 +48,17 @@ Bind to a model to listen to only fetches
 
 ```
     model.on('xhr:read', function(context) {
-      ...
+      context.on('success', function() {
+        // context.model has been updated
+      });
     });
 ```
 
 Override the XHR payload or cache it
 
 ```
-    Backbone.xhrEvents.on('xhr', function(method, model, context) {
-      context.on('after-send', function(data, status, xhr, responseType, context) {
+    Backbone.xhrEvents.on('xhr', function(context) {
+      context.on('after-send', function(data, status, xhr, responseType) {
 
         // responseType will either be 'success' or 'error'
         if (method === 'read' && responseType === 'success') {
@@ -74,11 +76,11 @@ Override the XHR payload or cache it
 Intercept a request and return a cached payload
 
 ```
-    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+    Backbone.xhrEvents.on('xhr', function(context) {
       if (context.method === 'read') {
         var cachedResult = _getFetchCache(context.options.url);
         if (cachedResult) {
-          context.preventDefault().success(JSON.parse(cachedResult), 'success', undefined);
+          context.preventDefault().success(JSON.parse(cachedResult), 'success');
         }
       }
     });
@@ -87,11 +89,11 @@ Intercept a request and return a cached payload
 Make a successful XHR look like a failure
 
 ```
-    model.on('xhr', function(method, context) {
+    model.on('xhr', function(context) {
       context.on('after-send', function(data, status, xhr, responseType) {
         if (responseType === 'success') {
           // provide the parameters that you would have wanted coming back directly from the $.ajax callback
-          context.preventDefault().error(...)
+          context.preventDefault().error(undefined, 'error', 'Not Found');
         }
       });
     });
@@ -100,8 +102,8 @@ Make a successful XHR look like a failure
 Alter the payload asynchronously after the initial response is returned
 
 ```
-    Backbone.xhrEvents.on('xhr', function(method, model, context) {
-      context.on('after-send', function(data, status, xhr, responseType) {
+    Backbone.xhrEvents.on('xhr', function(context) {
+      context.on('after-send', function(data, status, xhr) {
         var handler = context.preventDefault();
         yourOwnGetDataAsyncMethod(function(data) {
           handler.success(data, status, xhr);
@@ -113,20 +115,20 @@ Alter the payload asynchronously after the initial response is returned
 Add simulated 1 second latency
 
 ```
-    Backbone.xhrEvents.on('xhr', function(method, model, context) {
-      context.on('after-send', function(data, status, xhr, responseType) {
+    Backbone.xhrEvents.on('xhr', function(context) {
+      context.on('after-send', function(p1, p2, p3, responseType) {
         var handler = context.preventDefault();
         setTimeout(function() {
-          handler.success(data, status, xhr);
+          handler[responseType].(p1, p2, p3);
         }, 1000);
       });
     });
 ```
 
-Set a default timeout on all XHR activity
+Set a default connection timeout on all XHR activity
 
 ```
-    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+    Backbone.xhrEvents.on('xhr', function(context) {
       context.options.timeout = 3000;
     });
 ```
@@ -173,7 +175,7 @@ Forward xhr events to another model
 Prevent duplicate concurrent submission of any XHR request
 
 ```
-    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+    Backbone.xhrEvents.on('xhr', function(context) {
       context.on('before-send', function(xhr, settings) {
         // we need to use before-send because Backbone.sync creates settings.data
 
@@ -197,7 +199,7 @@ Prevent duplicate concurrent submission of any XHR request
 Prevent the error callback if the request is aborted
 
 ```
-    Backbone.xhrEvents.on('xhr', function(method, model, context) {
+    Backbone.xhrEvents.on('xhr', function(context) {
       context.on('abort', function() {
         context.preventDefault().complete('abort');
       });
