@@ -177,19 +177,19 @@ describe("backbone-xhr-events", function () {
 
 
 
-  describe("whenFetched", function () {
+  describe("ensureFetched", function () {
     it("should return callback directly if already fetched", function () {
       var spy = sinon.spy();
       model.fetch();
       $.success({});
-      model.whenFetched(spy);
+      model.ensureFetched(spy);
       expect(spy).to.have.been.calledWith(model);
     });
     it("should initiate a fetch if not already fetched", function () {
       var spy = sinon.spy(),
           onFetch = sinon.spy();
       model.on('xhr:read', onFetch);
-      model.whenFetched(spy);
+      model.ensureFetched(spy);
       expect(onFetch.callCount).to.eql(1);
       $.success({});
       expect(spy).to.have.been.calledWith(model);
@@ -197,7 +197,7 @@ describe("backbone-xhr-events", function () {
     it("should initiate a fetch and call error handler when applicable", function () {
       var successSpy = sinon.spy(),
           errorSpy = sinon.spy();
-      model.whenFetched(successSpy, errorSpy);
+      model.ensureFetched(successSpy, errorSpy);
       $.error({});
       expect(errorSpy.callCount).to.eql(1);
       expect(successSpy.callCount).to.eql(0);
@@ -207,7 +207,7 @@ describe("backbone-xhr-events", function () {
           onFetch = sinon.spy();
       model.fetch();
       model.on('xhr:read', onFetch);
-      model.whenFetched(spy);
+      model.ensureFetched(spy);
       expect(onFetch.callCount).to.eql(0);
       $.success({});
       expect(spy).to.have.been.calledWith(model);
@@ -216,10 +216,20 @@ describe("backbone-xhr-events", function () {
       var successSpy = sinon.spy(),
           errorSpy = sinon.spy();
       model.fetch();
-      model.whenFetched(successSpy, errorSpy);
+      model.ensureFetched(successSpy, errorSpy);
       $.error({});
       expect(errorSpy.callCount).to.eql(1);
       expect(successSpy.callCount).to.eql(0);
+    });
+    it("should not fail if the success callback is not provided", function () {
+      model.fetch();
+      model.ensureFetched();
+      $.success({});
+    });
+    it("should not fail if the error callback is not provided", function () {
+      model.fetch();
+      model.ensureFetched();
+      $.error({});
     });
   });
 

@@ -149,14 +149,16 @@
     // execute the callback directly if the model is fetch
     // initiate a fetch with this callback as the success option if not fetched
     // or plug into the current fetch if in progress
-    Backbone.Model.prototype.whenFetched = Backbone.Collection.whenFetched = function(success, error) {
+    Backbone.Model.prototype.ensureFetched = Backbone.Collection.prototype.ensureFetched = function(success, error) {
         var model = this;
 
         function successWrapper() {
-            success(model);
+            if (success) {
+                success(model);
+            }
         }
         if (this.hasBeenFetched) {
-            return success(this);
+            return successWrapper();
         }
         // find current fetch call (if any)
         var _fetch = _.find(this[xhrLoadingAttribute], function(req) {
