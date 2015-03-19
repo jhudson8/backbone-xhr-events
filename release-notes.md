@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.2...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.12.0...master)
+
+## v0.12.0 - March 19th, 2015
+- rename "whenFetched" to "ensureFetched" - f88cabf
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.11.2...v0.12.0)
 
 ## v0.11.2 - February 19th, 2015
 - don't eager set options.url (it can be accessed with "before-send" event) - d3de6a8
