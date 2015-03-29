@@ -220,6 +220,22 @@ Prevent the error callback if the request is aborted
 ```
 
 
+### Method/Event Reference
+
+// create, update, patch, delete, read
+* ***fetch***: ***read*** method (```xhr:read```)
+* ***destroy***: ***delete*** method (```xhr:destroy```)
+* ***save*** (new): ***create*** method (```xhr:create```)
+* ***save*** (existing): ***update*** (```xhr:update```)
+* ***save*** (existing with options {patch: true}): ***patch*** (```xhr:patch```)
+
+Custom Event
+
+```
+this.fetch({event: foo}) -> "xhr:foo"
+```
+
+
 ### Overrides
 Almost all event names and model/global attributes can be overridden to suit your needs.
 
