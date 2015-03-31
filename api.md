@@ -220,7 +220,7 @@ Prevent the error callback if the request is aborted
 ```
 
 
-### Method/Event Reference
+### XHR Method Reference
 
 // create, update, patch, delete, read
 * ***fetch***: ***read*** method (```xhr:read```)
