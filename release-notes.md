@@ -2,7 +2,18 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.12.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v1.0.0...master)
+
+## v1.0.0 - April 17th, 2015
+All dependencies are peer dependencies now and you no longer provide Backbone and underscore when initializing backbone-xhr-events.
+
+The initialization is now just
+
+```javascript
+require('backbone-xhr-events');
+```
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v0.12.0...v1.0.0)
 
 ## v0.12.0 - March 19th, 2015
 - rename "whenFetched" to "ensureFetched" - f88cabf
