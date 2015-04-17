@@ -24,18 +24,15 @@
  */
 (function(main) {
     if (typeof define === 'function' && define.amd) {
-        define([], function() {
-            // with AMD
-            //  require(
-            //    ['backbone', 'underscore', 'backbone-xhr-events'], function(Backbone, _, backboneXhrEvents) {
-            //    backboneXhrEvents(Backbone, _); 
-            //  });
-            return main;
+        define(['backbone', 'underscore'], function(Backbone, _) {
+            // AMD
+            return main(Backbone, _);
         });
     } else if (typeof exports !== 'undefined' && typeof require !== 'undefined') {
-        // with CommonJS
-        // require('backbone-xhr-events')(require('backbone'), require('underscore'));
-        module.exports = main;
+        // CommonJS
+        var Backbone = require('backbone');
+        var _ = require('underscore');
+        module.exports = main(Backbone, _);
     } else {
         main(Backbone, _);
     }

@@ -37,7 +37,7 @@ var chai = require('chai'),
       }
     }
   };
-require('../index')(Backbone, _);
+require('../index');
 chai.use(sinonChai);
 Backbone.$ = $;
 

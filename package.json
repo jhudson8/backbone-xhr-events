@@ -20,8 +20,9 @@
   "scripts": {
     "test": "mocha"
   },
-  "dependencies": {
-    "underscore": "*"
+  "peerDependencies": {
+    "underscore": "*",
+    "backbone": "*"
   },
   "analyze": false,
   "devDependencies": {
@@ -30,6 +31,7 @@
     "sinon": "*",
     "sinon-chai": "*",
     "uglify-js": "*",
+    "underscore": "*",
     "backbone": "*"
   },
   "license": "MIT"
