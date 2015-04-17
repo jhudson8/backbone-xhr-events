@@ -26,16 +26,16 @@ Browser:
 
 CommonJS
 
-```
-    require('backbone-xhr-events')(require('backbone'), require('underscore'));
+```javascript
+    require('backbone-xhr-events');
 ```
 
 AMD
 
-```
+```javascript
     require(
-      ['backbone', 'underscore', 'backbone-xhr-events'], function(Backbone, _, backboneXhrEvents) {
-      backboneXhrEvents(Backbone, _); 
+      ['backbone-xhr-events'], function() {
+      // don't do do anything with it... it's initialized now
     });
 ```
 
