@@ -1,7 +1,7 @@
 {
   "name": "backbone-xhr-events",
   "main": "backbone-xhr-events.js",
-  "version": "0.12.0",
+  "version": "1.0.0",
   "homepage": "https://github.com/jhudson8/backbone-xhr-events",
   "authors": [
     "Joe Hudson <joehud@gmail.com>"

@@ -1,6 +1,6 @@
 {
   "name": "backbone-xhr-events",
-  "version": "0.12.0",
+  "version": "1.0.0",
   "author": "Joe Hudson <joehud@gmail.com>",
   "description": "Backbone plugin giving you full featured XHR observer capabilities",
   "repository": {
