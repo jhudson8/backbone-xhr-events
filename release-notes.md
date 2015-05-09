@@ -2,7 +2,13 @@
 
 ## Development
 
-[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v1.0.0...master)
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v1.0.1...master)
+
+## v1.0.1 - May 9th, 2015
+- bug fix: in-browser source include loading - 11d4a00
+
+
+[Commits](https://github.com/jhudson8/backbone-xhr-events/compare/v1.0.0...v1.0.1)
 
 ## v1.0.0 - April 17th, 2015
 All dependencies are peer dependencies now and you no longer provide Backbone and underscore when initializing backbone-xhr-events.
