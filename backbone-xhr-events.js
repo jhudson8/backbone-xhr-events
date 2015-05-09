@@ -30,9 +30,7 @@
         });
     } else if (typeof exports !== 'undefined' && typeof require !== 'undefined') {
         // CommonJS
-        var Backbone = require('backbone');
-        var _ = require('underscore');
-        module.exports = main(Backbone, _);
+        module.exports = main(require('backbone'), require('underscore'));
     } else {
         main(Backbone, _);
     }
